@@ -6,8 +6,8 @@
   "scripts": {
     "build": "tsc"
   },
-  "dependencies": {},
   "devDependencies": {
+    "@nx/node": "^21.3.11",
     "typescript": "^5.5.3"
   },
   "private": true
