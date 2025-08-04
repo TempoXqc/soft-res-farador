@@ -1,0 +1,229 @@
+{
+  "version": "6.0",
+  "nxVersion": "19.5.6",
+  "deps": {
+    "@angular/animations": "^17.0.0",
+    "@angular/common": "^17.0.0",
+    "@angular/compiler": "^17.0.0",
+    "@angular/core": "^17.0.0",
+    "@angular/forms": "^17.0.0",
+    "@angular/platform-browser": "^17.0.0",
+    "@angular/platform-browser-dynamic": "^17.0.0",
+    "@angular/router": "^17.0.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.14.10",
+    "axios": "^1.7.2",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "luxon": "^3.4.4",
+    "mongoose": "^8.5.1",
+    "@angular-devkit/build-angular": "^17.0.0",
+    "@angular-eslint/builder": "^17.0.0",
+    "@angular-eslint/eslint-plugin": "^17.0.0",
+    "@angular-eslint/eslint-plugin-template": "^17.0.0",
+    "@angular-eslint/schematics": "^17.0.0",
+    "@angular-eslint/template-parser": "^17.0.0",
+    "@angular/cli": "~17.0.0",
+    "@angular/compiler-cli": "^17.0.0",
+    "@nx/angular": "19.5.6",
+    "@nx/esbuild": "19.5.6",
+    "@nx/eslint": "19.5.6",
+    "@nx/eslint-plugin": "19.5.6",
+    "@nx/jest": "19.5.6",
+    "@nx/js": "19.5.6",
+    "@nx/node": "19.5.6",
+    "@nx/workspace": "19.5.6",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/luxon": "^3.4.2",
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^20.14.11",
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "eslint": "~8.57.0",
+    "eslint-config-prettier": "^9.0.0",
+    "jest": "^29.7.0",
+    "nx": "19.5.6",
+    "prettier": "^3.0.0",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.4.5"
+  },
+  "pathMappings": {
+    "@wow-guild/frontend/*": [
+      "apps/frontend/src/*"
+    ],
+    "@wow-guild/backend/*": [
+      "apps/backend/src/*"
+    ],
+    "@wow-guild/shared/*": [
+      "libs/shared/src/*"
+    ]
+  },
+  "nxJsonPlugins": [],
+  "fileMap": {
+    "nonProjectFiles": [
+      {
+        "file": ".DS_Store",
+        "hash": "12218314037562295978"
+      },
+      {
+        "file": ".gitignore",
+        "hash": "4721705218038715677"
+      },
+      {
+        "file": ".nx/workspace-data/d/server-process.json",
+        "hash": "16187265303014121319"
+      },
+      {
+        "file": "eslintrc.json",
+        "hash": "18214936638274030959"
+      },
+      {
+        "file": "nx.json",
+        "hash": "13672862651145405876"
+      },
+      {
+        "file": "package.json",
+        "hash": "2924992403146799174"
+      },
+      {
+        "file": "tsconfig.base.json",
+        "hash": "7043173867442944487"
+      }
+    ],
+    "projectFileMap": {
+      "backend": [
+        {
+          "file": "app/backend/project.json",
+          "hash": "6237464873588501931"
+        },
+        {
+          "file": "app/backend/src/main.ts",
+          "hash": "2209510350397104973"
+        },
+        {
+          "file": "app/backend/src/models.ts",
+          "hash": "1184004115339453121"
+        },
+        {
+          "file": "app/backend/tsconfig.json",
+          "hash": "15791665256471196866"
+        }
+      ],
+      "frontend": [
+        {
+          "file": "app/frontend/angular.json",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "app/frontend/project.json",
+          "hash": "8374085289795527441"
+        },
+        {
+          "file": "app/frontend/src/app/app-routing.module.ts",
+          "hash": "9267262195286941289"
+        },
+        {
+          "file": "app/frontend/src/app/app.component.ts",
+          "hash": "4685632606010791531"
+        },
+        {
+          "file": "app/frontend/src/app/app.module.ts",
+          "hash": "7451610170694683333"
+        },
+        {
+          "file": "app/frontend/src/app/auth/auth.module.ts",
+          "hash": "12252231812952931928"
+        },
+        {
+          "file": "app/frontend/src/app/auth/auth.service.ts",
+          "hash": "18434128191695757818"
+        },
+        {
+          "file": "app/frontend/src/app/auth/login/login.component.html",
+          "hash": "16446944023116100575"
+        },
+        {
+          "file": "app/frontend/src/app/auth/login/login.component.ts",
+          "hash": "755208801609692115"
+        },
+        {
+          "file": "app/frontend/src/app/auth/register/register.component.html",
+          "hash": "16495317894091888078"
+        },
+        {
+          "file": "app/frontend/src/app/auth/register/register.component.ts",
+          "hash": "18426081432851497714"
+        },
+        {
+          "file": "app/frontend/src/app/character/character.service.ts",
+          "hash": "16664642250597456356"
+        },
+        {
+          "file": "app/frontend/src/app/guards/auth.guard.ts",
+          "hash": "7804614396545462491"
+        },
+        {
+          "file": "app/frontend/src/app/raid/loot-table/loot-table.component.html",
+          "hash": "9932320220576426364"
+        },
+        {
+          "file": "app/frontend/src/app/raid/loot-table/loot-table.component.ts",
+          "hash": "7621303592249185060"
+        },
+        {
+          "file": "app/frontend/src/app/raid/raid-detail/raid-detail.component.html",
+          "hash": "6114210611082052888"
+        },
+        {
+          "file": "app/frontend/src/app/raid/raid-detail/raid-detail.component.ts",
+          "hash": "15305385311294362901"
+        },
+        {
+          "file": "app/frontend/src/app/raid/raid-list/raid-list.component.html",
+          "hash": "17614475806809126244"
+        },
+        {
+          "file": "app/frontend/src/app/raid/raid-list/raid-list.component.ts",
+          "hash": "16623138118773198649"
+        },
+        {
+          "file": "app/frontend/src/app/raid/raid-module/raid.module.ts",
+          "hash": "12775242433916797277"
+        },
+        {
+          "file": "app/frontend/src/app/raid/raid.service.ts",
+          "hash": "28992354823591917"
+        },
+        {
+          "file": "app/frontend/src/environment/environment.prod.ts",
+          "hash": "10673871912971123985"
+        },
+        {
+          "file": "app/frontend/src/environment/environments.ts",
+          "hash": "13670151952283046635"
+        },
+        {
+          "file": "app/frontend/tsconfig.app.json",
+          "hash": "3211946076545164061"
+        }
+      ],
+      "shared": [
+        {
+          "file": "libs/shared/project.json",
+          "hash": "2229534962567743301"
+        },
+        {
+          "file": "libs/shared/src/lib/types.ts",
+          "hash": "16359379429565908172"
+        }
+      ]
+    }
+  }
+}
