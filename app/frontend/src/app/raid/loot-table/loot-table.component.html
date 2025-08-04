@@ -1,0 +1,14 @@
+<table>
+    <tr>
+        <th>Item</th>
+        <th>Reserved By</th>
+        <th>Action</th>
+    </tr>
+    <tr *ngFor="let loot of loots">
+        <td>{{ loot.name }}</td>
+        <td>{{ getReservedBy(loot.itemId).join(', ') }}</td>
+        <td>
+            <button [disabled]="locked" (click)="onReserve(loot.itemId)">+</button>
+        </td>
+    </tr>
+</table>

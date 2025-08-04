@@ -1,0 +1,15 @@
+<h2>Raid: {{ raid.date | date }}</h2>
+<p *ngIf="raid.locked">Locked (Read-only)</p>
+
+<select (change)="filterDifficulty($event.target.value)">
+    <option value="normal">Normal</option>
+    <option value="heroic">Heroic</option>
+    <option value="mythic">Mythic</option>
+</select>
+<ul>
+    <li *ngFor="let boss of bosses" (click)="selectBoss(boss.id)">
+        {{ boss.name }}
+    </li>
+</ul>
+
+<app-loot-table [loots]="loots" [reservations]="raid.reservations" [locked]="raid.locked" (reserve)="reserve($event)"></app-loot-table>

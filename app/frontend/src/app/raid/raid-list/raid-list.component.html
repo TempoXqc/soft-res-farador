@@ -1,0 +1,8 @@
+<h2>Raid History</h2>
+<ul>
+    <li *ngFor="let raid of raids" (click)="viewRaid(raid._id)">
+        {{ raid.date | date }} {{ raid.locked ? '(Locked)' : '' }}
+    </li>
+</ul>
+<input type="date" [(ngModel)]="newDate">
+<button (click)="createNew()">New Raid</button>
