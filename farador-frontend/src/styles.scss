@@ -1,0 +1,23 @@
+@import 'primeflex/primeflex.scss';
+@import 'primeng/resources/themes/lara-light-indigo/theme.css';
+@import 'primeng/resources/primeng.min.css';
+@import 'primeicons/primeicons.css';
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f4f9;
+  color: #333;
+}
+
+button {
+  cursor: pointer;
+}
+
+h2 {
+  margin-top: 1rem;
+}
+
+.p-m-3 {
+  margin: 1.5rem;
+}
