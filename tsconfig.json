@@ -9,5 +9,11 @@
     "resolveJsonModule": true,
     "outDir": "dist"
   },
-  "include": ["server/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "src/**/*.js",
+    "src/**/*.jsx"
+  ]
 }

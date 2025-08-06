@@ -1,0 +1,61 @@
+<div class="raid-container">
+    <div class="raid-list">
+        <div class="raid-item" *ngFor="let raid of raids" (click)="openModal(raid)">
+            {{ raid.name }} ({{ raid.difficulty }}) - {{ raid.date | date:'medium' }}
+            <span class="icon-button">➤</span>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="boss-list">
+            <h2>Bosses</h2>
+            <div class="boss-item" *ngFor="let boss of selectedRaid?.bosses"
+                 [class.selected]="boss === selectedBoss"
+                 (click)="selectBoss(boss)">
+                <img class="boss-icon" [src]="boss.iconUrl" alt="{{ boss.name }} icon">
+                <span class="boss-name">{{ boss.name }}</span>
+            </div>
+        </div>
+        <div class="loot-list" #lootList>
+            <table class="loot-table" *ngIf="selectedBoss">
+                <thead>
+                <tr>
+                    <th>Loot</th>
+                    <th>Slot</th>
+                    <th>Reserved By</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <ng-container *ngFor="let group of getGroupedLoots()">
+                    <tr class="slot-header">
+                        <td colspan="4">{{ group.slot }}</td>
+                    </tr>
+                    <tr *ngFor="let loot of group.items">
+                        <td>
+                            <img class="item-icon" [src]="loot.iconUrl" alt="{{ loot.itemName }} icon">
+                            <a class="loot-name q4" [attr.data-wowhead]="getLootDataWowhead(loot)">
+                                {{ loot.itemName }}
+                            </a>
+                        </td>
+                        <td class="loot-slot">{{ loot.slot }}</td>
+                        <td>
+                            <ng-container *ngIf="loot.softReservedBy?.length > 0; else noReserve">
+                                    <span class="player-tag" *ngFor="let player of loot.softReservedBy; let isLast = last">
+                                        {{ player }}{{ isLast ? '' : ', ' }}
+                                    </span>
+                            </ng-container>
+                            <ng-template #noReserve>None</ng-template>
+                        </td>
+                        <td>
+                            <button class="reserve-button">Reserve</button>
+                        </td>
+                    </tr>
+                </ng-container>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

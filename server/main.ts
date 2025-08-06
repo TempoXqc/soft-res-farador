@@ -1,22 +1,23 @@
+// server/main.ts ou server/index.ts
 import express from 'express';
 import mongoose from 'mongoose';
-import cors from 'cors';
 import dotenv from 'dotenv';
-import authRoutes from './routes/auth';
-import raidRoutes from './routes/raids';
+import raidsRoutes from './routes/raids';
 
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
 app.use(express.json());
-app.use('/api/auth', authRoutes);
-app.use('/api/raids', raidRoutes);
+app.use('/api/raids', raidsRoutes);
 
-mongoose.connect(process.env.MONGODB_URI!)
+mongoose.connect(process.env.MONGODB_URI as string)
     .then(() => {
-        console.log('MongoDB connecté');
-        app.listen(PORT, () => console.log(`Serveur actif sur http://localhost:${PORT}`));
+        console.log('✅ Connecté à MongoDB');
+        app.listen(PORT, () => {
+            console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`);
+        });
     })
-    .catch((err) => console.error('Erreur de connexion MongoDB:', err));
+    .catch((err) => {
+        console.error('❌ Erreur de connexion MongoDB :', err);
+    });

@@ -1,0 +1,215 @@
+.raid-container {
+  width: 80%;
+  max-height: 80vh;
+  margin: 0 auto;
+  background-color: #0d0d0d; /* More contrasted black background */
+  border-radius: 10px;
+  padding: 20px;
+  color: white;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.raid-list {
+  width: 100%;
+}
+
+.raid-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #333; /* Adjusted border for contrast */
+  transition: background 0.3s ease;
+  cursor: pointer;
+}
+
+.raid-item:hover {
+  background-color: #222;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9); /* Increased opacity for more contrast */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  position: relative;
+  display: flex;
+  width: 80%;
+  max-height: 80%;
+  background-color: #0d0d0d; /* More contrasted black background */
+  border-radius: 10px;
+  padding: 20px;
+  color: white;
+  align-items: flex-start;
+}
+
+.close-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 5px;
+  z-index: 10;
+}
+
+.boss-list {
+  flex: 1;
+  max-width: 30%;
+  overflow-y: auto;
+  border-right: 2px solid #333; /* Adjusted border for contrast */
+}
+
+.boss-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  background-color: #1a1a1a; /* Darker framed background for uniformity */
+  font-weight: bold;
+  border-bottom: 2px solid #333; /* Adjusted border for contrast */
+  margin-bottom: 4px;
+  border-radius: 5px;
+}
+
+.boss-item.selected,
+.boss-item:hover {
+  background-color: #282828; /* Lighter hover for contrast */
+}
+
+.boss-icon {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.boss-name {
+  flex: 1;
+  color: #ffffff;
+}
+
+.loot-list {
+  flex: 2;
+  overflow-y: auto;
+  margin-top: 3.75rem;
+  max-height: calc(80vh - 6rem);
+  background-color: #0d0d0d; /* More contrasted black background */
+}
+
+.loot-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #0d0d0d; /* More contrasted black background */
+  color: white;
+}
+
+.loot-table th {
+  padding: 10px;
+  border: 1px solid #333; /* Adjusted border for contrast */
+  text-align: left;
+  vertical-align: middle;
+  background-color: #1a1a1a; /* Darker header for uniformity and contrast */
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  z-index: 10; /* Increased z-index to ensure headers are on top */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Added shadow to prevent content showing behind */
+  opacity: 1; /* Ensure full opacity */
+}
+
+.loot-table td {
+  padding: 10px;
+  border: 1px solid #333; /* Adjusted border for contrast */
+  text-align: left;
+  vertical-align: middle;
+  background-color: #0d0d0d; /* More contrasted black background */
+}
+
+.slot-header {
+  background-color: #1a1a1a; /* Darker header for uniformity */
+  font-weight: bold;
+  font-size: 1.1rem;
+  padding: 10px;
+  border-bottom: 2px solid #333; /* Adjusted border for contrast */
+  color: #ffffff;
+}
+
+.slot-header td {
+  border: none;
+  padding: 8px;
+}
+
+.item-icon {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+  object-fit: cover;
+  border-radius: 5px;
+  vertical-align: middle;
+}
+
+.loot-name {
+  text-decoration: none;
+  vertical-align: middle;
+}
+
+.player-tag {
+  display: inline;
+  color: #bbb; /* Slightly lighter for contrast */
+}
+
+.reserve-button {
+  background-color: #1a1a1a; /* Darker button for uniformity */
+  color: white;
+  border: 1px solid #333; /* Adjusted border for contrast */
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reserve-button:hover {
+  background-color: #282828; /* Lighter hover for contrast */
+}
+
+.loot-slot {
+  font-style: italic;
+  color: #bbb; /* Slightly lighter for contrast */
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  color: #0056b3;
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+
+/* Quality color classes for item links */
+.q0 { color: #9d9d9d; } /* Poor */
+.q1 { color: #ffffff; } /* Common */
+.q2 { color: #1eff00; } /* Uncommon */
+.q3 { color: #0070dd; } /* Rare */
+.q4 { color: #a335ee; } /* Epic */
+.q5 { color: #ff8000; } /* Legendary */
+.q6 { color: #e6cc80; } /* Artifact */

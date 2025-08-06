@@ -1,47 +1,39 @@
-
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { LoginModalComponent } from './auth/login-modal.component';
-import { RaidListComponent } from './raids/raid-list.component';
-import { RaidReservationComponent } from './raids/raid-reservation.component';
+import { AppRoutingModule } from './app-routing.module';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 import { DialogModule } from 'primeng/dialog';
+import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { ToastModule } from 'primeng/toast';
-import { TableModule } from 'primeng/table';
-import { AccordionModule } from 'primeng/accordion';
-import { DropdownModule } from 'primeng/dropdown';
-import { MessageService } from 'primeng/api';
-import { Toast } from 'primeng/toast';
+
+import { LoginModalComponent } from './auth/login-modal.component';
+import {RaidReservationComponent} from "./raids/raid-reservation/raid-reservation.component";
+import {RaidListComponent} from "./raids/raid-list/raid-list.component";
 
 @NgModule({
     declarations: [
-        AppComponent
+        AppComponent,
+        LoginModalComponent,
+        RaidReservationComponent,
+        RaidListComponent,
     ],
     imports: [
         BrowserModule,
         BrowserAnimationsModule,
-        HttpClientModule,
-        FormsModule,
         AppRoutingModule,
+        FormsModule,
+        HttpClientModule,
         DialogModule,
-        ButtonModule,
-        InputTextModule,
-        ToastModule,
         TableModule,
-        AccordionModule,
-        DropdownModule,
-        RaidReservationComponent,
-        LoginModalComponent,
-        RaidListComponent
+        ButtonModule,
+        InputTextModule
     ],
-    providers: [MessageService],
-    bootstrap: [AppComponent]
+    providers: [],
+    bootstrap: [AppComponent],
 })
 export class AppModule {}

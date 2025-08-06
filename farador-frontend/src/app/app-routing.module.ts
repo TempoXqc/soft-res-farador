@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { RaidListComponent } from './raids/raid-list.component';
-import { RaidReservationComponent } from './raids/raid-reservation.component';
+import { RaidListComponent } from './raids/raid-list/raid-list.component';
+import { RaidReservationComponent } from './raids/raid-reservation/raid-reservation.component';
 
 const routes: Routes = [
     { path: '', component: RaidListComponent },

@@ -1,20 +1,23 @@
+// ✅ server/models/Raid.ts
 import mongoose from 'mongoose';
 
 const LootSchema = new mongoose.Schema({
-    itemId: Number,
-    name: String,
-    classAllowed: [String],
-    reservedBy: [String]
-});
+    itemName: String,
+    slot: String,
+    softReservedBy: [String]
+}, { _id: false });
 
 const BossSchema = new mongoose.Schema({
     name: String,
     loots: [LootSchema]
-});
+}, { _id: false });
 
 const RaidSchema = new mongoose.Schema({
-    date: String,
+    name: String,
+    difficulty: String,
+    date: Date,
     bosses: [BossSchema]
 });
 
-export default mongoose.model('Raid', RaidSchema);
+const RaidModel = mongoose.model('Raid', RaidSchema);
+export default RaidModel;

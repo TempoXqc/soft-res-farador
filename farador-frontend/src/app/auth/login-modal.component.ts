@@ -1,27 +1,12 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'primeng/api';
-import {Dialog} from "primeng/dialog";
+import {DialogModule} from "primeng/dialog";
 
 @Component({
     selector: 'app-login-modal',
-    imports: [
-        Dialog
-    ],
-    template: `
-        <p-dialog header="Connexion" [(visible)]="display">
-            <div class="p-fluid">
-                <label for="username">Nom du personnage</label>
-                <input id="username" type="text" pInputText [(ngModel)]="username">
-
-                <label for="password">Mot de passe</label>
-                <input id="password" type="password" pInputText [(ngModel)]="password">
-            </div>
-            <p-footer>
-                <button pButton label="Se connecter" (click)="login()"></button>
-            </p-footer>
-        </p-dialog>
-    `
+    templateUrl: './login-modal.component.html',
+    styleUrls: ['./login-modal.component.scss']
 })
 export class LoginModalComponent {
     display = true;

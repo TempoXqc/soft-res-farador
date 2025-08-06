@@ -1,18 +1,8 @@
-import { Router } from 'express';
-import Raid from '../models/Raid';
+import express from 'express';
+import { getRaids } from '../controllers/raids.controller';
 
-const router = Router();
+const router = express.Router();
 
-router.get('/', async (_, res) => {
-    const raids = await Raid.find();
-    res.json(raids);
-});
-
-router.post('/', async (req, res) => {
-    const { date, bosses } = req.body;
-    const raid = new Raid({ date, bosses });
-    await raid.save();
-    res.json(raid);
-});
+router.get('/', getRaids);
 
 export default router;
