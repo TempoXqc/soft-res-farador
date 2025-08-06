@@ -51,9 +51,16 @@ export class RaidListComponent implements OnInit {
             return [];
         }
 
-        // Group loots by slot
+        // Define weapon-related slots
+        const weaponSlots = [
+            'Bow', 'Dagger', 'One-Hand Mace', 'Two-Hand Mace', 'Polearm',
+            'Staff', 'One-Hand Sword', 'Two-Hand Sword', 'Warglaives',
+            'Fist Weapon', 'One-Hand Axe', 'Crossbow', 'Off-Hand'
+        ];
+
+        // Group loots by slot, combining weapon slots under 'Weapons'
         const grouped = this.selectedBoss.loots.reduce((acc: any, loot: any) => {
-            const slot = loot.slot || 'Unknown';
+            const slot = weaponSlots.includes(loot.slot) ? 'Weapons' : (loot.slot || 'Unknown');
             if (!acc[slot]) {
                 acc[slot] = [];
             }
@@ -63,11 +70,15 @@ export class RaidListComponent implements OnInit {
 
         // Convert to array, sort slots, and sort items within each slot by itemName
         return Object.keys(grouped)
-            .sort((a, b) => a.localeCompare(b)) // Sort slots alphabetically
+            .sort((a, b) => {
+                if (a === 'Weapons') return 1;
+                if (b === 'Weapons') return -1;
+                return a.localeCompare(b);
+            })
             .map(slot => ({
                 slot,
                 items: grouped[slot].sort((a: any, b: any) =>
-                    a.itemName.localeCompare(b.itemName) // Sort items by name
+                    a.itemName.localeCompare(b.itemName)
                 )
             }));
     }
@@ -83,5 +94,9 @@ export class RaidListComponent implements OnInit {
             data += `&bonus=${bonus}`;
         }
         return data;
+    }
+
+    getWarcraftLogsUrl(raid: any): string {
+        return `https://www.warcraftlogs.com/reports/${raid._id}`;
     }
 }

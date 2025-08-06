@@ -1,39 +1,38 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { AppComponent } from './app.component';
-import { AppRoutingModule } from './app-routing.module';
-import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-
+import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
-import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-
-import { LoginModalComponent } from './auth/login-modal.component';
-import {RaidReservationComponent} from "./raids/raid-reservation/raid-reservation.component";
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { AppComponent } from './app.component';
+import { AuthService } from './services/auth.service';
+import { RaidService } from './services/raid.service';
 import {RaidListComponent} from "./raids/raid-list/raid-list.component";
+import {LoginModalComponent} from "./auth/login-modal.component"; // Adjust path if necessary
 
 @NgModule({
     declarations: [
         AppComponent,
-        LoginModalComponent,
-        RaidReservationComponent,
         RaidListComponent,
+        LoginModalComponent
     ],
     imports: [
         BrowserModule,
-        BrowserAnimationsModule,
-        AppRoutingModule,
-        FormsModule,
         HttpClientModule,
+        FormsModule,
         DialogModule,
-        TableModule,
         ButtonModule,
-        InputTextModule
+        InputTextModule,
+        ToastModule
     ],
-    providers: [],
-    bootstrap: [AppComponent],
+    providers: [
+        MessageService,
+        AuthService,
+        RaidService
+    ],
+    bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }

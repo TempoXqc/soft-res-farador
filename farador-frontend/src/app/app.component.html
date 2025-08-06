@@ -1,2 +1,13 @@
-<h1>{{ title }}</h1>
-<router-outlet></router-outlet>
+<div class="app-container">
+    <div class="header">
+        <h1 class="app-title">{{ title }}</h1>
+        <button *ngIf="authService.isLoggedIn | async" class="logout-button" (click)="logout()">Déconnexion</button>
+    </div>
+    <ng-container *ngIf="authService.isLoggedIn | async; else loginTemplate">
+        <app-raid-list></app-raid-list>
+    </ng-container>
+    <ng-template #loginTemplate>
+        <button class="login-button" (click)="showLoginModal = true">Connexion</button>
+    </ng-template>
+    <app-login-modal *ngIf="showLoginModal" [(visible)]="showLoginModal"></app-login-modal>
+</div>

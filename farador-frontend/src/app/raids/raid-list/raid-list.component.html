@@ -1,14 +1,19 @@
+<script src="https://wow.zamimg.com/js/tooltips.js"></script>
 <div class="raid-container">
     <div class="raid-list">
-        <div class="raid-item" *ngFor="let raid of raids" (click)="openModal(raid)">
-            {{ raid.name }} ({{ raid.difficulty }}) - {{ raid.date | date:'medium' }}
-            <span class="icon-button">➤</span>
+        <div class="raid-item" *ngFor="let raid of raids">
+            <span class="raid-name">{{ raid.name }} ({{ raid.difficulty }}) - {{ raid.date | date:'medium' }}</span>
+            <a [href]="getWarcraftLogsUrl(raid)" target="_blank" class="logs-icon">
+                <img src="https://assets.rpglogs.com/img/warcraft/favicon.png?v=4" alt="Warcraft Logs" class="warcraft-logs-icon">
+            </a>
+            <span class="icon-button" (click)="openModal(raid)">➤</span>
         </div>
     </div>
 </div>
 
 <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
+        <button class="close-icon" (click)="closeModal()">✕</button>
         <div class="boss-list">
             <h2>Bosses</h2>
             <div class="boss-item" *ngFor="let boss of selectedRaid?.bosses"

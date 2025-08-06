@@ -1,7 +1,6 @@
-import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { MessageService } from 'primeng/api';
-import {DialogModule} from "primeng/dialog";
+import { AuthService } from '../services/auth.service';
 
 @Component({
     selector: 'app-login-modal',
@@ -9,23 +8,26 @@ import {DialogModule} from "primeng/dialog";
     styleUrls: ['./login-modal.component.scss']
 })
 export class LoginModalComponent {
-    display = true;
+    @Input() visible = false;
+    @Output() visibleChange = new EventEmitter<boolean>();
+
     username = '';
     password = '';
 
-    constructor(private http: HttpClient, private messageService: MessageService) {}
+    constructor(private authService: AuthService, private messageService: MessageService) {}
 
     login() {
-        this.http.post<any>('http://localhost:3000/api/auth/login', {
-            username: this.username,
-            password: this.password
-        }).subscribe({
-            next: (res) => {
-                localStorage.setItem('token', res.token);
-                this.display = false;
-                this.messageService.add({severity:'success', summary:'Connecté', detail:'Bienvenue ' + this.username});
+        this.authService.login(this.username, this.password).subscribe({
+            next: () => {
+                this.messageService.add({ severity: 'success', summary: 'Connecté', detail: 'Bienvenue ' + this.username });
+                this.closeModal();
             },
-            error: () => this.messageService.add({severity:'error', summary:'Erreur', detail:'Connexion échouée'})
+            error: () => this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Identifiant ou mot de passe incorrect' })
         });
+    }
+
+    closeModal() {
+        this.visible = false;
+        this.visibleChange.emit(false);
     }
 }

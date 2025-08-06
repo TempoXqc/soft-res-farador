@@ -1,12 +1,11 @@
-<p-dialog header="Connexion" [(visible)]="display">
-    <div class="p-fluid">
+<p-dialog header="Connexion" [(visible)]="visible" [modal]="true" (onHide)="closeModal()">
+    <div class="p-field">
         <label for="username">Nom du personnage</label>
-        <input id="username" type="text" pInputText [(ngModel)]="username">
-
-        <label for="password">Mot de passe</label>
-        <input id="password" type="password" pInputText [(ngModel)]="password">
+        <input pInputText id="username" [(ngModel)]="username" />
     </div>
-    <p-footer>
-        <button pButton label="Se connecter" (click)="login()"></button>
-    </p-footer>
+    <div class="p-field">
+        <label for="password">Mot de passe</label>
+        <input pInputText id="password" type="password" [(ngModel)]="password" />
+    </div>
+    <p-button label="Connexion" (click)="login()"></p-button>
 </p-dialog>
