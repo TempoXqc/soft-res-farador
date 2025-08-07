@@ -1,37 +1,39 @@
 .p-dialog {
-  background-color: #0d0d0d;
-  color: white;
-  border: 1px solid #333;
-  border-radius: 10px;
+  background-color: #121212;
+  color: #e0e0e0;
+  border: 1px solid #444;
+  border-radius: 12px;
+  padding: 20px;
 }
 
 .p-field {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 label {
   display: block;
-  margin-bottom: 0.5rem;
-  color: #bbb;
+  margin-bottom: 0.7rem;
+  color: #ccc;
+  font-weight: 500;
 }
 
 input {
   width: 100%;
-  padding: 0.5rem;
-  background-color: #1a1a1a;
-  border: 1px solid #333;
-  color: white;
-  border-radius: 5px;
+  padding: 0.7rem;
+  background-color: #1e1e1e;
+  border: 1px solid #444;
+  color: #e0e0e0;
+  border-radius: 8px;
 }
 
 .p-button {
-  background-color: #1a1a1a;
+  background-color: #007bff;
   color: white;
-  border: 1px solid #333;
-  padding: 6px 12px;
-  border-radius: 5px;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
 }
 
 .p-button:hover {
-  background-color: #282828;
+  background-color: #0056b3;
 }

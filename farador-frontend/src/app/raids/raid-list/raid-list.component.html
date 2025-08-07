@@ -1,14 +1,29 @@
-<script src="https://wow.zamimg.com/js/tooltips.js"></script>
 <div class="raid-container">
-    <div class="raid-list">
-        <div class="raid-item" *ngFor="let raid of raids">
-            <span class="raid-name">{{ raid.name }} ({{ raid.difficulty }}) - {{ raid.date | date:'medium' }}</span>
-            <a [href]="getWarcraftLogsUrl(raid)" target="_blank" class="logs-icon">
-                <img src="https://assets.rpglogs.com/img/warcraft/favicon.png?v=4" alt="Warcraft Logs" class="warcraft-logs-icon">
-            </a>
-            <span class="icon-button" (click)="openModal(raid)">➤</span>
-        </div>
-    </div>
+    <table class="raid-table" *ngIf="getGroupedRaids().length > 0; else noRaids">
+        <thead>
+        <tr>
+            <th>Raid</th>
+            <th>Réservation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let group of getGroupedRaids()">
+            <td>
+                <div class="raid-group">
+                    <div *ngFor="let raid of group.raids">
+                        {{ raid.name }} ({{ raid.difficulty }}) - {{ raid.date | date:'medium' }}
+                    </div>
+                </div>
+            </td>
+            <td>
+                <span class="icon-button" (click)="openModal(group.raids[0])">➤</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <ng-template #noRaids>
+        <p>Aucun raid disponible. Vérifiez la connexion à l'API ou la base de données.</p>
+    </ng-template>
 </div>
 
 <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
@@ -16,12 +31,17 @@
         <button class="close-icon" (click)="closeModal()">✕</button>
         <div class="boss-list">
             <h2>Bosses</h2>
-            <div class="boss-item" *ngFor="let boss of selectedRaid?.bosses"
-                 [class.selected]="boss === selectedBoss"
-                 (click)="selectBoss(boss)">
-                <img class="boss-icon" [src]="boss.iconUrl" alt="{{ boss.name }} icon">
-                <span class="boss-name">{{ boss.name }}</span>
+            <div *ngIf="selectedRaid && selectedRaid.bosses; else noBosses">
+                <div class="boss-item" *ngFor="let boss of selectedRaid.bosses"
+                     [class.selected]="boss === selectedBoss"
+                     (click)="selectBoss(boss)">
+                    <img class="boss-icon" [src]="getBossIconUrl(boss)" alt="{{ boss.name }} icon">
+                    <span class="boss-name">{{ boss.name }}</span>
+                </div>
             </div>
+            <ng-template #noBosses>
+                <p>Aucun boss disponible.</p>
+            </ng-template>
         </div>
         <div class="loot-list" #lootList>
             <table class="loot-table" *ngIf="selectedBoss">
@@ -40,7 +60,7 @@
                     </tr>
                     <tr *ngFor="let loot of group.items">
                         <td>
-                            <img class="item-icon" [src]="loot.iconUrl" alt="{{ loot.itemName }} icon">
+                            <img class="item-icon" [src]="getItemIconUrl(loot)" alt="{{ loot.itemName }} icon">
                             <a class="loot-name q4" [attr.data-wowhead]="getLootDataWowhead(loot)">
                                 {{ loot.itemName }}
                             </a>
@@ -55,7 +75,8 @@
                             <ng-template #noReserve>None</ng-template>
                         </td>
                         <td>
-                            <button class="reserve-button">Reserve</button>
+                            <button class="reserve-button" *ngIf="!isReservedByCurrentUser(loot)" (click)="reserveLoot(selectedBoss.name, loot)">Reserve</button>
+                            <button class="reserve-button" *ngIf="isReservedByCurrentUser(loot)" (click)="removeReservation(selectedBoss.name, loot)">Annuler</button>
                         </td>
                     </tr>
                 </ng-container>
@@ -64,3 +85,5 @@
         </div>
     </div>
 </div>
+
+<p-toast></p-toast>

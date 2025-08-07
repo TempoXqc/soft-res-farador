@@ -1,13 +1,21 @@
 <div class="app-container">
     <div class="header">
-        <h1 class="app-title">{{ title }}</h1>
-        <button *ngIf="authService.isLoggedIn | async" class="logout-button" (click)="logout()">Déconnexion</button>
+        <div class="user-menu" *ngIf="isLoggedIn">
+            <div class="user-profile" (click)="toggleDropdown()">
+                <span class="user-icon">👤</span>
+                <span class="username">{{ username || 'Utilisateur' }}</span>
+            </div>
+            <div class="dropdown-menu" *ngIf="showDropdown">
+                <button class="dropdown-item" (click)="logout()">Déconnexion</button>
+                <button class="dropdown-item" (click)="navigateToBisLoot()">BIS Loot</button>
+                <button class="dropdown-item" (click)="navigateToWowArmory()">Wow Armory</button>
+                <button class="dropdown-item" (click)="navigateToRaiderIo()">Raider.IO</button>
+            </div>
+        </div>
+        <div class="login-menu" *ngIf="!isLoggedIn">
+            <button class="login-button" (click)="logLoginClick()">Connexion</button>
+        </div>
     </div>
-    <ng-container *ngIf="authService.isLoggedIn | async; else loginTemplate">
-        <app-raid-list></app-raid-list>
-    </ng-container>
-    <ng-template #loginTemplate>
-        <button class="login-button" (click)="showLoginModal = true">Connexion</button>
-    </ng-template>
-    <app-login-modal *ngIf="showLoginModal" [(visible)]="showLoginModal"></app-login-modal>
+    <app-login-modal [visible]="showLoginModal" (visibleChange)="onLoginModalClose()"></app-login-modal>
+    <router-outlet></router-outlet>
 </div>

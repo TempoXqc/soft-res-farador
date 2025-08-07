@@ -13,38 +13,54 @@
   flex-direction: column;
 }
 
-.raid-list {
+.raid-table {
   width: 100%;
-}
-
-.raid-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  border-bottom: 2px solid #333;
-  transition: background 0.3s ease;
-  cursor: pointer;
-  font-size: 1.2rem;
-  margin-bottom: 10px;
+  border-collapse: collapse;
   background-color: #1a1a1a;
-  border-radius: 5px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-.raid-name {
-  flex: 1;
+.raid-table th {
+  background-color: #282828;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 12px;
+  text-align: left;
+  border-bottom: 2px solid #333;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.raid-table td {
+  padding: 12px;
+  border-bottom: 1px solid #333;
+  vertical-align: middle;
+  background-color: #1a1a1a;
+}
+
+.raid-table tr:hover {
+  background-color: #2e2e2e;
+}
+
+.raid-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .warcraft-logs-icon {
-  width: 20px;
-  height: 20px;
-  margin: 0 15px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
 }
 
 .logs-icon {
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .icon-button {
@@ -53,12 +69,13 @@
   color: #0056b3;
   cursor: pointer;
   font-size: 1.8rem;
+  transition: background-color 0.3s ease;
 }
 
 .icon-button:hover {
   background-color: #282828;
   border-radius: 50%;
-  padding: 10px;
+  padding: 8px;
 }
 
 .modal-overlay {
@@ -71,6 +88,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .modal-content {
@@ -84,6 +102,7 @@
   padding: 20px;
   color: white;
   align-items: flex-start;
+  overflow: hidden;
 }
 
 .close-icon {

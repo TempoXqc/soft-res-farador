@@ -3,6 +3,7 @@ export interface Raid {
     name: string;
     date: string;
     difficulty: 'Normal' | 'Heroic' | 'Mythic';
+    groupId: number;
     bosses: Boss[];
 }
 

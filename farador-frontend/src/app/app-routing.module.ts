@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { RaidListComponent } from './raids/raid-list/raid-list.component';
-import { RaidReservationComponent } from './raids/raid-reservation/raid-reservation.component';
 
-const routes: Routes = [
-    { path: '', component: RaidListComponent },
-    { path: 'raid/:id', component: RaidReservationComponent }
+export const routes: Routes = [
+    { path: 'raids', component: RaidListComponent },
+    { path: '', redirectTo: '/raids', pathMatch: 'full' },
+    { path: '**', redirectTo: '/raids' }
 ];
 
 @NgModule({
@@ -13,4 +13,3 @@ const routes: Routes = [
     exports: [RouterModule]
 })
 export class AppRoutingModule {}
-

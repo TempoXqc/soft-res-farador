@@ -2,6 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { jwtDecode } from 'jwt-decode';
+
+interface JwtPayload {
+    username: string;
+    role: string;
+    class: string;
+    armoryUrl: string;
+}
 
 @Injectable({
     providedIn: 'root'
@@ -27,5 +35,19 @@ export class AuthService {
     logout() {
         localStorage.removeItem('token');
         this.isLoggedInSubject.next(false);
+    }
+
+    getCurrentUser(): string | null {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const decoded: JwtPayload = jwtDecode(token);
+                return decoded.username;
+            } catch (error) {
+                console.error('Error decoding JWT:', error);
+                return null;
+            }
+        }
+        return null;
     }
 }
