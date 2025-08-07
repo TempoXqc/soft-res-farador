@@ -16,6 +16,12 @@ export class RaidService {
         return this.http.get<Raid[]>(this.apiUrl);
     }
 
+    createRaid(raidData: any): Observable<any> {
+        const token = localStorage.getItem('token');
+        const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
+        return this.http.post(this.apiUrl, raidData, { headers });
+    }
+
     reserveLootInGroup(groupId: number, bossName: string, itemId: string, user: string, reserve: boolean): Observable<any> {
         const token = localStorage.getItem('token');
         const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;

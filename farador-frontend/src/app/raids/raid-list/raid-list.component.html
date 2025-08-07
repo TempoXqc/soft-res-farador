@@ -1,7 +1,7 @@
 <div class="raid-container" *ngIf="getCurrentUser(); else notLoggedIn">
     <p-toast></p-toast>
     <div class="table-wrapper">
-        <table class="raid-table">
+        <table *ngFor="let group of raidGroups" class="raid-table">
             <thead>
             <tr>
                 <th>Groupes</th>
@@ -10,7 +10,7 @@
             </tr>
             </thead>
             <tbody class="raid-table-body">
-            <tr *ngFor="let group of raidGroups">
+            <tr>
                 <td>Réservation {{ group.groupId }}</td>
                 <td>
                     <div *ngFor="let raid of group.raids">
@@ -23,10 +23,36 @@
             </tr>
             </tbody>
         </table>
+        <div *ngIf="isAdmin()" style="margin-bottom: 20px;">
+            <p-button label="Créer un raid" (onClick)="openCreateRaidModal()"></p-button>
+        </div>
+
+        <p-dialog header="Créer un nouveau raid" [(visible)]="showCreateRaidModal" [modal]="true" (onHide)="closeCreateRaidModal()">
+            <div style="margin-top: 10px;">
+                <label for="raidDifficulty">Difficulté : </label>
+                <p-dropdown id="raidDifficulty" [(ngModel)]="newRaid.difficulty" [options]="difficulties" placeholder="Sélectionner la difficulté"></p-dropdown>
+            </div>
+            <div style="margin-top: 10px;">
+                <label for="raidDate">Date (mardi uniquement) : </label>
+                <p-calendar
+                        id="raidDate"
+                        [appendTo]="'body'"
+                        [(ngModel)]="newRaid.date"
+                        [disabledDays]="disabledDays"
+                        [showIcon]="true"
+                        dateFormat="dd/mm/yy"
+                        placeholder="Sélectionner un mardi"
+                        [style]="{ 'font-size': '0.85rem', 'width': '260px' }"
+                />
+            </div>
+            <div style="margin-top: 20px;">
+                <p-button label="Créer" (onClick)="createRaid()"></p-button>
+            </div>
+        </p-dialog>
     </div>
 
     <div *ngIf="raidGroups.length === 0">
-        Aucun raid disponible. Vérifiez la connexion à l'API ou la base de données.
+        Aucun raid disponible.
     </div>
 
     <div class="modal-overlay" *ngIf="selectedGroup">

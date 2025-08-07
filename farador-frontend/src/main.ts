@@ -15,13 +15,25 @@ import { TableModule } from 'primeng/table';
 import { DropdownModule } from 'primeng/dropdown';
 import { MessageService } from 'primeng/api';
 import { routes } from './app/app-routing.module';
+import { CalendarModule } from 'primeng/calendar';
 
 bootstrapApplication(AppComponent, {
     providers: [
         provideRouter(routes),
         provideHttpClient(),
         provideAnimations(),
-        importProvidersFrom(CommonModule, FormsModule, ToastModule, DialogModule, ButtonModule, InputTextModule, TooltipModule, TableModule, DropdownModule),
+        importProvidersFrom(
+            CalendarModule,
+            CommonModule,
+            FormsModule,
+            ToastModule,
+            DialogModule,
+            ButtonModule,
+            InputTextModule,
+            TooltipModule,
+            TableModule,
+            DropdownModule
+        ),
         MessageService
     ]
 }).catch(err => {

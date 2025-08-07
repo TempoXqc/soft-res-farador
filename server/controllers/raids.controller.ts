@@ -49,6 +49,10 @@ export const createRaid = async (req: Request, res: Response) => {
         }
 
         const raidData = req.body;
+        const raidDate = new Date(raidData.date);
+        raidDate.setHours(20, 0, 0, 0);
+        raidData.date = raidDate;
+
         const raid = new RaidModel(raidData);
         await raid.save();
         console.log('✅ Raid créé :', raid);

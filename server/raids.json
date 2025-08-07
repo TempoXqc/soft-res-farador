@@ -236,59 +236,6 @@
           "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_knife_1h_etherealraid_d_01.jpg"
         },
         {
-          "id": "loomithar_007",
-          "itemId": "237595",
-          "itemName": "Venerated Silken Offering",
-          "slot": "Legs",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Paladin",
-            "Priest",
-            "Shaman"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystoragebarrel_dark.jpg"
-        },
-        {
-          "id": "loomithar_008",
-          "itemId": "237593",
-          "itemName": "Dreadful Silken Offering",
-          "slot": "Legs",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Death Knight",
-            "Demon Hunter",
-            "Warlock"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystoragebarrel_terra.jpg"
-        },
-        {
-          "id": "loomithar_009",
-          "itemId": "237596",
-          "itemName": "Zenith Silken Offering",
-          "slot": "Legs",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Evoker",
-            "Hunter",
-            "Warrior"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystoragebarrel_gold.jpg"
-        },
-        {
-          "id": "loomithar_010",
-          "itemId": "237594",
-          "itemName": "Mystic Silken Offering",
-          "slot": "Legs",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Druid",
-            "Mage",
-            "Monk",
-            "Rogue"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystoragebarrel_purple.jpg"
-        },
-        {
           "id": "loomithar_011",
           "itemId": "237723",
           "itemName": "Ward of the Weaving-Beast",
@@ -296,15 +243,6 @@
           "softReservedBy": [],
           "classAllowed": [],
           "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_shield_1h_etherealraid_d_01.jpg"
-        },
-        {
-          "id": "loomithar_012",
-          "itemId": "loomithar_012",
-          "itemName": "Pattern: Duskthread Lining",
-          "slot": "Tailoring Pattern",
-          "softReservedBy": [],
-          "classAllowed": [],
-          "iconUrl": "https://wowhead.com/icon/loomithar_012"
         },
         {
           "id": "loomithar_013",
@@ -411,59 +349,6 @@
           "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_hand_1h_etherealraid_d_01.jpg"
         },
         {
-          "id": "naazindhri_007",
-          "itemId": "237587",
-          "itemName": "Venerated Binding Agent",
-          "slot": "Hands",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Paladin",
-            "Priest",
-            "Shaman"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystoragebattery_dark.jpg"
-        },
-        {
-          "id": "naazindhri_008",
-          "itemId": "237585",
-          "itemName": "Dreadful Binding Agent",
-          "slot": "Hands",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Death Knight",
-            "Demon Hunter",
-            "Warlock"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystoragebattery_terra.jpg"
-        },
-        {
-          "id": "naazindhri_009",
-          "itemId": "237588",
-          "itemName": "Zenith Binding Agent",
-          "slot": "Hands",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Evoker",
-            "Hunter",
-            "Warrior"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystoragebattery_gold.jpg"
-        },
-        {
-          "id": "naazindhri_010",
-          "itemId": "237586",
-          "itemName": "Mystic Binding Agent",
-          "slot": "Hands",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Druid",
-            "Mage",
-            "Monk",
-            "Rogue"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystoragebattery_purple.jpg"
-        },
-        {
           "id": "naazindhri_011",
           "itemId": "237730",
           "itemName": "Voidglass Spire",
@@ -472,15 +357,7 @@
           "classAllowed": [],
           "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_staff_2h_etherealraid_d_02.jpg"
         },
-        {
-          "id": "naazindhri_012",
-          "itemId": "242398",
-          "itemName": "Naazindhri's Mystic Lash",
-          "slot": "Trinket",
-          "softReservedBy": [],
-          "classAllowed": [],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_soulbinderbossinttrinket.jpg"
-        },
+
         {
           "id": "naazindhri_013",
           "itemId": "242391",
@@ -583,68 +460,6 @@
           "softReservedBy": [],
           "classAllowed": [],
           "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_sword_2h_etherealraid_d_01.jpg"
-        },
-        {
-          "id": "araz_006",
-          "itemId": "araz_006",
-          "itemName": "Plans: Siphoning Stiletto",
-          "slot": "Blacksmithing Plans",
-          "softReservedBy": [],
-          "classAllowed": [],
-          "iconUrl": "https://wowhead.com/icon/araz_006"
-        },
-        {
-          "id": "araz_007",
-          "itemId": "237591",
-          "itemName": "Venerated Foreboding Beaker",
-          "slot": "Head",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Paladin",
-            "Priest",
-            "Shaman"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystoragepyramid_dark.jpg"
-        },
-        {
-          "id": "araz_008",
-          "itemId": "237589",
-          "itemName": "Dreadful Foreboding Beaker",
-          "slot": "Head",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Death Knight",
-            "Demon Hunter",
-            "Warlock"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystoragepyramid_terra.jpg"
-        },
-        {
-          "id": "araz_009",
-          "itemId": "237592",
-          "itemName": "Zenith Foreboding Beaker",
-          "slot": "Head",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Evoker",
-            "Hunter",
-            "Warrior"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystoragepyramid_gold.jpg"
-        },
-        {
-          "id": "araz_010",
-          "itemId": "237590",
-          "itemName": "Mystic Foreboding Beaker",
-          "slot": "Head",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Druid",
-            "Mage",
-            "Monk",
-            "Rogue"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystoragepyramid_purple.jpg"
         },
         {
           "id": "araz_011",
@@ -840,59 +655,6 @@
           "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_manaforgetanktrinket3.jpg"
         },
         {
-          "id": "soulhunters_013",
-          "itemId": "237599",
-          "itemName": "Venerated Yearning Cursemark",
-          "slot": "Shoulder",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Paladin",
-            "Priest",
-            "Shaman"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystoragesphere_dark.jpg"
-        },
-        {
-          "id": "soulhunters_014",
-          "itemId": "237597",
-          "itemName": "Dreadful Yearning Cursemark",
-          "slot": "Shoulder",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Death Knight",
-            "Demon Hunter",
-            "Warlock"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystoragesphere_terra.jpg"
-        },
-        {
-          "id": "soulhunters_015",
-          "itemId": "237600",
-          "itemName": "Zenith Yearning Cursemark",
-          "slot": "Shoulder",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Evoker",
-            "Hunter",
-            "Warrior"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystoragesphere_gold.jpg"
-        },
-        {
-          "id": "soulhunters_016",
-          "itemId": "237598",
-          "itemName": "Mystic Yearning Cursemark",
-          "slot": "Shoulder",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Druid",
-            "Mage",
-            "Monk",
-            "Rogue"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystoragesphere_purple.jpg"
-        },
-        {
           "id": "soulhunters_017",
           "itemId": "238031",
           "itemName": "Veiled Manta Vest",
@@ -1023,59 +785,6 @@
           "softReservedBy": [],
           "classAllowed": [],
           "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_voidprism.jpg"
-        },
-        {
-          "id": "fractillus_010",
-          "itemId": "237583",
-          "itemName": "Venerated Voidglass Contaminant",
-          "slot": "Chest",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Paladin",
-            "Priest",
-            "Shaman"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystorageurn_dark.jpg"
-        },
-        {
-          "id": "fractillus_011",
-          "itemId": "237581",
-          "itemName": "Dreadful Voidglass Contaminant",
-          "slot": "Chest",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Death Knight",
-            "Demon Hunter",
-            "Warlock"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystorageurn_terra.jpg"
-        },
-        {
-          "id": "fractillus_012",
-          "itemId": "237584",
-          "itemName": "Zenith Voidglass Contaminant",
-          "slot": "Chest",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Evoker",
-            "Hunter",
-            "Warrior"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystorageurn_gold.jpg"
-        },
-        {
-          "id": "fractillus_013",
-          "itemId": "237582",
-          "itemName": "Mystic Voidglass Contaminant",
-          "slot": "Chest",
-          "softReservedBy": [],
-          "classAllowed": [
-            "Druid",
-            "Mage",
-            "Monk",
-            "Rogue"
-          ],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_etherealenergystorageurn_purple.jpg"
         },
         {
           "id": "fractillus_014",
@@ -1445,15 +1154,6 @@
           "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_blobofswirlingvoid_terra.jpg"
         },
         {
-          "id": "dimensius_014",
-          "itemId": "237602",
-          "itemName": "Hungering Void Curio",
-          "slot": "Curio",
-          "softReservedBy": [],
-          "classAllowed": [],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_icon_shadowcouncilorb_purple.jpg"
-        },
-        {
           "id": "dimensius_015",
           "itemId": "246565",
           "itemName": "Cosmic Hearthstone",
@@ -1461,33 +1161,6 @@
           "softReservedBy": [],
           "classAllowed": [],
           "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/spell_holy_circleofrenewal_shadow.jpg"
-        },
-        {
-          "id": "dimensius_016",
-          "itemId": "243061",
-          "itemName": "Unbound Star-Eater",
-          "slot": "Mount",
-          "softReservedBy": [],
-          "classAllowed": [],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_cosmicdragonmount.jpg"
-        },
-        {
-          "id": "dimensius_017",
-          "itemId": "186640",
-          "itemName": "Vandal's Gearglider",
-          "slot": "Mount",
-          "softReservedBy": [],
-          "classAllowed": [],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_brokermount_silver.jpg"
-        },
-        {
-          "id": "dimensius_018",
-          "itemId": "242728",
-          "itemName": "The Bone Freezer",
-          "slot": "Mount",
-          "softReservedBy": [],
-          "classAllowed": [],
-          "iconUrl": "https://wow.zamimg.com/images/wow/icons/large/inv_voidcreepermount_blue.jpg"
         },
         {
           "id": "dimensius_019",
