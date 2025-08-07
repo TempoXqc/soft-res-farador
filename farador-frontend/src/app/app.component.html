@@ -12,10 +12,6 @@
                 <button class="dropdown-item" (click)="navigateToRaiderIo()">Raider.IO</button>
             </div>
         </div>
-        <div class="login-menu" *ngIf="!isLoggedIn">
-            <button class="login-button" (click)="logLoginClick()">Connexion</button>
-        </div>
     </div>
-    <app-login-modal [visible]="showLoginModal" (visibleChange)="onLoginModalClose()"></app-login-modal>
     <router-outlet></router-outlet>
 </div>

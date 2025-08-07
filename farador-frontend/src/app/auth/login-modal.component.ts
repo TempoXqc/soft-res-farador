@@ -28,6 +28,7 @@ export class LoginModalComponent {
             next: () => {
                 this.messageService.add({ severity: 'success', summary: 'Connecté', detail: `Bienvenue ${this.username}` });
                 this.closeModal();
+                this.authService.isLoggedInSubject.next(true);
             },
             error: () => {
                 this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Identifiant ou mot de passe incorrect' });

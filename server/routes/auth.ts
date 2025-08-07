@@ -1,44 +1,59 @@
-import { Router } from 'express';
-import User from '../models/User';
-import jwt from 'jsonwebtoken';
+// auth.service.ts
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
-const router = Router();
+@Injectable({
+    providedIn: 'root'
+})
+export class AuthService {
+    private currentUser: string | null = null;
+    private token: string | null = null;
 
-router.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-    console.log('Login attempt:', { username, password });
-    try {
-        const user = await User.findOne({ username });
-        console.log('User found:', user);
-
-        if (!user || typeof user.password !== 'string') {
-            console.log('User not found or invalid password field:', { username });
-            return res.status(401).json({ message: 'Utilisateur introuvable ou mot de passe invalide' });
+    constructor(private http: HttpClient) {
+        // Vérifie si un token existe dans localStorage au démarrage
+        this.token = localStorage.getItem('token');
+        if (this.token) {
+            try {
+                const decoded = this.decodeToken(this.token);
+                this.currentUser = decoded.username;
+            } catch (error) {
+                console.error('Erreur lors du décodage du token au démarrage :', error);
+                this.logout();
+            }
         }
-
-        const valid = password === user.password;
-        console.log('Password valid:', valid);
-        if (!valid) {
-            return res.status(401).json({ message: 'Mot de passe incorrect' });
-        }
-
-        const token = jwt.sign(
-            {
-                username: user.username,
-                role: user.role,
-                class: user.class,
-                armoryUrl: user.armoryUrl
-            },
-            process.env.JWT_SECRET!,
-            { expiresIn: '12h' }
-        );
-
-        console.log('Login successful, token generated:', token);
-        res.json({ token });
-    } catch (error) {
-        console.error('Error during login:', error);
-        res.status(500).json({ message: 'Erreur serveur lors de la connexion', error });
     }
-});
 
-export default router;
+    login(username: string, password: string): Observable<any> {
+        return this.http.post('/api/auth/login', { username, password }).pipe(
+            tap((response: any) => {
+                this.token = response.token;
+                this.currentUser = username;
+                localStorage.setItem('token', this.token);
+            })
+        );
+    }
+
+    getCurrentUser(): string | null {
+        return this.currentUser;
+    }
+
+    getToken(): string | null {
+        return this.token || localStorage.getItem('token');
+    }
+
+    logout() {
+        this.currentUser = null;
+        this.token = null;
+        localStorage.removeItem('token');
+    }
+
+    private decodeToken(token: string): any {
+        try {
+            return JSON.parse(atob(token.split('.')[1]));
+        } catch (error) {
+            throw new Error('Token invalide');
+        }
+    }
+}

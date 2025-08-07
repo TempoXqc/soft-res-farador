@@ -11,11 +11,23 @@ interface CustomJwtPayload extends JwtPayload {
 }
 
 export const getRaids = async (req: Request, res: Response) => {
+    const token = req.headers.authorization?.split('Bearer ')[1];
+    if (!token) {
+        console.log('❌ Aucun token fourni pour getRaids');
+        return res.status(401).json({ message: 'Aucun token fourni' });
+    }
+
     try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as CustomJwtPayload;
+        console.log('🔐 Token décodé pour getRaids :', decoded);
+
         const raids = await RaidModel.find();
         console.log('✅ Raids trouvés :', raids);
         res.json(raids);
     } catch (error) {
+        if (error instanceof jwt.JsonWebTokenError) {
+            return res.status(401).json({ message: 'Token invalide' });
+        }
         console.error('❌ Erreur lors du chargement des raids:', error);
         res.status(500).json({ message: 'Erreur lors du chargement des raids', error });
     }
@@ -99,11 +111,10 @@ export const updateReservation = async (req: Request, res: Response) => {
                 }
             }
         }
-        console.log('📊 Nombre de réservations de l’utilisateur :', reservedCount);
 
         if (add && reservedCount >= 2) {
             console.log('❌ Limite de 2 réservations atteinte pour :', username);
-            return res.status(403).json({ message: 'Limite de 2 réservations par raid atteinte' });
+            return res.status(403).json({ message: 'Limite de 2 réservations atteinte' });
         }
 
         if (add) {
@@ -117,13 +128,13 @@ export const updateReservation = async (req: Request, res: Response) => {
         }
 
         await raid.save();
-        console.log('✅ Réservation mise à jour :', raid);
+        console.log('✅ Raid mis à jour :', raid._id);
 
         // Emit WebSocket event
         const io = (req as any).io as Server;
         io.emit('raidUpdated', raid);
 
-        res.json({ message: 'Réservation mise à jour avec succès', raid });
+        res.json({ message: 'Réservation mise à jour avec succès' });
     } catch (error) {
         console.error('❌ Erreur lors de la mise à jour de la réservation:', error);
         res.status(500).json({ message: 'Erreur lors de la mise à jour de la réservation', error });

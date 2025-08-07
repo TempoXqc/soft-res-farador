@@ -15,10 +15,23 @@ interface JwtPayload {
     providedIn: 'root'
 })
 export class AuthService {
-    private isLoggedInSubject = new BehaviorSubject<boolean>(!!localStorage.getItem('token'));
+    public isLoggedInSubject = new BehaviorSubject<boolean>(!!localStorage.getItem('token'));
     isLoggedIn = this.isLoggedInSubject.asObservable();
+    private loginModalSubject = new BehaviorSubject<boolean>(false);
+    loginModalState$ = this.loginModalSubject.asObservable();
 
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient) {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const decoded: JwtPayload = jwtDecode(token);
+                this.isLoggedInSubject.next(true);
+            } catch (error) {
+                console.error('Erreur lors du décodage du token au démarrage :', error);
+                this.logout();
+            }
+        }
+    }
 
     login(username: string, password: string): Observable<any> {
         return this.http.post<any>('http://localhost:3000/api/auth/login', {
@@ -28,6 +41,7 @@ export class AuthService {
             tap(res => {
                 localStorage.setItem('token', res.token);
                 this.isLoggedInSubject.next(true);
+                this.hideLoginModal();
             })
         );
     }
@@ -49,5 +63,17 @@ export class AuthService {
             }
         }
         return null;
+    }
+
+    getToken(): string | null {
+        return localStorage.getItem('token');
+    }
+
+    showLoginModal() {
+        this.loginModalSubject.next(true);
+    }
+
+    hideLoginModal() {
+        this.loginModalSubject.next(false);
     }
 }

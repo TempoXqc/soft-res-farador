@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RaidService } from '../../services/raid.service';
@@ -11,41 +11,60 @@ import { DropdownModule } from 'primeng/dropdown';
 import { UserService } from '../../services/user.service';
 import { Raid } from '../../models/raid';
 import { User } from '../../models/user';
-import {ToastModule} from "primeng/toast";
+import { ToastModule } from 'primeng/toast';
+import { jwtDecode } from 'jwt-decode';
+import {LoginModalComponent} from "../../auth/login-modal.component";
+import {Router} from "@angular/router";
 
 @Component({
     selector: 'app-raid-list',
     standalone: true,
-    imports: [CommonModule, FormsModule, TooltipModule, TableModule, DropdownModule, ToastModule],
+    imports: [CommonModule, FormsModule, TooltipModule, TableModule, DropdownModule, ToastModule, LoginModalComponent],
     templateUrl: './raid-list.component.html',
     styleUrls: ['./raid-list.component.scss']
 })
 export class RaidListComponent implements OnInit, OnDestroy {
     raids: Raid[] = [];
     users: User[] = [];
-    showModal = false;
-    selectedRaid: Raid | null = null;
+    isLoggedIn: boolean = false;
+    username: string | null = null;
     selectedBoss: any = null;
+    showLoginModal: boolean = true;
+    raidGroups: { groupId: number; raids: Raid[]; bosses: any[] }[] = [];
+    selectedGroup: { groupId: number; raids: Raid[]; bosses: any[] } | null = null;
     @ViewChild('lootList') lootList!: ElementRef;
     @Output() raidCreated = new EventEmitter<void>();
     private socket: Socket;
-
 
     constructor(
         private raidService: RaidService,
         private authService: AuthService,
         private messageService: MessageService,
-        private userService: UserService
+        private userService: UserService,
+        private cdr: ChangeDetectorRef,
+        private router: Router,
     ) {
         this.socket = io('http://localhost:3000', { reconnection: true, reconnectionAttempts: 5 });
     }
 
     ngOnInit() {
-        const currentUser = this.authService.getCurrentUser();
-        this.loadRaids();
-        this.loadUsers();
+        this.authService.isLoggedIn.subscribe(isLoggedIn => {
+            this.isLoggedIn = isLoggedIn;
+            this.username = this.authService.getCurrentUser();
+            if (isLoggedIn) {
+                this.loadRaids();
+                this.loadUsers();
+            } else {
+                this.raids = [];
+                this.raidGroups = [];
+                this.selectedGroup = null;
+                this.selectedBoss = null;
+                this.messageService.add({ severity: 'warn', summary: 'Connexion requise', detail: 'Veuillez vous connecter pour voir les raids.', life: 5000 });
+                this.authService.showLoginModal();
+                this.cdr.detectChanges();
+            }
+        });
         this.setupSocketListeners();
-        this.loadWowheadTooltips();
     }
 
     ngOnDestroy() {
@@ -53,14 +72,38 @@ export class RaidListComponent implements OnInit, OnDestroy {
     }
 
     loadRaids() {
+        if (!this.getCurrentUser()) {
+            console.log('Utilisateur non connecté, chargement des raids annulé.');
+            this.raids = [];
+            this.raidGroups = [];
+            return;
+        }
         this.raidService.getRaids().subscribe({
             next: (raids) => {
                 this.raids = raids.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+                this.groupRaidsByGroupId();
+                this.cdr.detectChanges();
             },
             error: (err: any) => {
                 this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Échec du chargement des raids', life: 5000 });
             }
         });
+    }
+
+    groupRaidsByGroupId() {
+        const groupsMap = new Map<number, { raids: Raid[]; bosses: any[] }>();
+        this.raids.forEach(raid => {
+            const groupId = raid.groupId;
+            if (!groupsMap.has(groupId)) {
+                groupsMap.set(groupId, { raids: [], bosses: raid.bosses || [] });
+            }
+            groupsMap.get(groupId)!.raids.push(raid);
+        });
+        this.raidGroups = Array.from(groupsMap.entries()).map(([groupId, data]) => ({
+            groupId,
+            raids: data.raids.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+            bosses: data.bosses
+        })).sort((a, b) => b.groupId - a.groupId);
     }
 
     loadUsers() {
@@ -89,126 +132,47 @@ export class RaidListComponent implements OnInit, OnDestroy {
             const index = this.raids.findIndex(r => r._id === updatedRaid._id);
             if (index !== -1) {
                 this.raids[index] = updatedRaid;
-                if (this.selectedRaid?._id === updatedRaid._id) {
-                    this.selectedRaid = updatedRaid;
-                    this.selectedBoss = updatedRaid.bosses.find((b: any) => b.name === this.selectedBoss?.name) || updatedRaid.bosses[0];
+                this.groupRaidsByGroupId();
+                if (this.selectedGroup && this.selectedGroup.groupId === updatedRaid.groupId) {
+                    this.selectedGroup = this.raidGroups.find(g => g.groupId === updatedRaid.groupId) || null;
+                    if (this.selectedBoss) {
+                        this.selectedBoss = this.selectedGroup?.bosses.find(b => b.name === this.selectedBoss.name) || null;
+                    }
                 }
-                this.raids = [...this.raids.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())];
-                console.log('Groupes après mise à jour :', JSON.stringify(this.getGroupedRaids(), null, 2));
+                this.cdr.detectChanges();
             }
         });
-
-        this.socket.on('raidCreated', (newRaid: Raid) => {
-            console.log('📡 Nouveau raid créé via WebSocket :', JSON.stringify(newRaid, null, 2));
-            this.raids = [newRaid, ...this.raids].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-            const previousGroups = this.getGroupedRaids().slice(0, -1);
-            this.autoReserveForNewGroup(previousGroups, newRaid.groupId);
-            console.log('Groupes après création :', JSON.stringify(this.getGroupedRaids(), null, 2));
-        });
     }
 
-    getGroupedRaids(): { groupId: number; raids: Raid[] }[] {
-        const grouped: { [key: number]: Raid[] } = {};
-        this.raids.forEach(raid => {
-            const groupId = raid.groupId !== undefined && raid.groupId !== null ? raid.groupId : 0;
-            if (!grouped[groupId]) {
-                grouped[groupId] = [];
-            }
-            grouped[groupId].push(raid);
-        });
-        const result = Object.keys(grouped)
-            .map(groupId => ({
-                groupId: parseInt(groupId),
-                raids: grouped[parseInt(groupId)].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-            }))
-            .sort((a, b) => b.groupId - a.groupId);
-        return result;
+    openGroupDetails(group: { groupId: number; raids: Raid[]; bosses: any[] }) {
+        this.selectedGroup = { ...group };
+        this.selectedBoss = group.bosses[0] || null;
+        this.scrollToTop();
     }
 
-    openModal(raid: Raid) {
-        if (!raid?.bosses?.length) {
-            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Aucun boss disponible pour ce raid', life: 5000 });
-            return;
-        }
-        this.selectedRaid = raid;
-        this.selectedBoss = raid.bosses[0];
-        this.showModal = true;
-        setTimeout(() => this.scrollToTop(), 0);
-    }
-
-    closeModal() {
-        this.showModal = false;
-        this.selectedRaid = null;
+    closeGroupDetails() {
+        this.selectedGroup = null;
         this.selectedBoss = null;
     }
 
     selectBoss(boss: any) {
         this.selectedBoss = boss;
+        this.scrollToTop();
     }
 
-    getGroupedLoots(): { slot: string; items: any[] }[] {
-        if (!this.selectedBoss?.loots) return [];
-        const grouped: { [key: string]: any[] } = {};
-        this.selectedBoss.loots.forEach((loot: any) => {
-            const slot = loot.slot || 'Unknown';
-            if (!grouped[slot]) {
-                grouped[slot] = [];
-            }
-            grouped[slot].push(loot);
-        });
-        return Object.keys(grouped).map(slot => ({
-            slot,
-            items: grouped[slot]
-        }));
-    }
-
-    getLootDataWowhead(loot: any): string {
-        return `item=${loot.itemId}`;
-    }
-
-    getBossIconUrl(boss: any): string {
-        return boss.iconUrl || `https://wow.zamimg.com/images/wow/icons/large/achievement_boss_${boss.name.toLowerCase().replace(/ /g, '')}.jpg`;
-    }
-
-    getItemIconUrl(loot: any): string {
-        return loot.iconUrl || 'https://wow.zamimg.com/images/wow/icons/large/inv_misc_questionmark.jpg';
-    }
-
-    isReservedByCurrentUser(loot: any): boolean {
-        const currentUser = this.authService.getCurrentUser();
-        return loot.softReservedBy?.includes(currentUser) || false;
-    }
-
-    isLocked(): boolean {
-        return false;
-    }
-
-    getCurrentUser(): string | null {
-        return this.authService.getCurrentUser();
-    }
-
-    loadWowheadTooltips() {
-        const script = document.createElement('script');
-        script.src = 'https://wow.zamimg.com/js/tooltips.js';
-        script.async = true;
-        document.head.appendChild(script);
-    }
-
-    reserveLoot(bossName: string, lootId: string) {
-        const currentUser = this.authService.getCurrentUser();
-        console.log('reserveLoot appelé avec :', { bossName, lootId, currentUser });
+    addReservation(bossName: string, lootId: string) {
+        const currentUser = this.getCurrentUser();
         if (!currentUser) {
-            console.log('Utilisateur non connecté');
             this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Utilisateur non connecté', life: 5000 });
             return;
         }
-        if (!this.selectedRaid || !this.selectedRaid.groupId) {
-            console.log('Aucun raid ou groupe sélectionné', { selectedRaid: this.selectedRaid });
-            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Aucun raid ou groupe sélectionné', life: 5000 });
+        if (!this.selectedGroup) {
+            console.log('Aucun groupe sélectionné', { selectedGroup: this.selectedGroup });
+            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Aucun groupe sélectionné', life: 5000 });
             return;
         }
-        console.log('Appel de reserveLootInGroup pour ajout', { groupId: this.selectedRaid.groupId, bossName, lootId, user: currentUser });
-        this.raidService.reserveLootInGroup(this.selectedRaid.groupId, bossName, lootId, currentUser, true).subscribe({
+        console.log('Appel de reserveLootInGroup pour ajout', { groupId: this.selectedGroup.groupId, bossName, lootId, user: currentUser });
+        this.raidService.reserveLootInGroup(this.selectedGroup.groupId, bossName, lootId, currentUser, true).subscribe({
             next: () => {
                 console.log('Réservation ajoutée avec succès');
                 this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Réservation ajoutée', life: 5000 });
@@ -221,20 +185,18 @@ export class RaidListComponent implements OnInit, OnDestroy {
     }
 
     removeReservation(bossName: string, lootId: string) {
-        const currentUser = this.authService.getCurrentUser();
-        console.log('removeReservation appelé avec :', { bossName, lootId, currentUser });
+        const currentUser = this.getCurrentUser();
         if (!currentUser) {
-            console.log('Utilisateur non connecté');
             this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Utilisateur non connecté', life: 5000 });
             return;
         }
-        if (!this.selectedRaid || !this.selectedRaid.groupId) {
-            console.log('Aucun raid ou groupe sélectionné', { selectedRaid: this.selectedRaid });
-            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Aucun raid ou groupe sélectionné', life: 5000 });
+        if (!this.selectedGroup) {
+            console.log('Aucun groupe sélectionné', { selectedGroup: this.selectedGroup });
+            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Aucun groupe sélectionné', life: 5000 });
             return;
         }
-        console.log('Appel de reserveLootInGroup pour suppression', { groupId: this.selectedRaid.groupId, bossName, lootId, user: currentUser });
-        this.raidService.reserveLootInGroup(this.selectedRaid.groupId, bossName, lootId, currentUser, false).subscribe({
+        console.log('Appel de reserveLootInGroup pour suppression', { groupId: this.selectedGroup.groupId, bossName, lootId, user: currentUser });
+        this.raidService.reserveLootInGroup(this.selectedGroup.groupId, bossName, lootId, currentUser, false).subscribe({
             next: () => {
                 console.log('Réservation supprimée avec succès');
                 this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Réservation supprimée', life: 5000 });
@@ -252,11 +214,11 @@ export class RaidListComponent implements OnInit, OnDestroy {
             this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Aucun utilisateur sélectionné pour le drop', life: 5000 });
             return;
         }
-        if (!this.selectedRaid || !this.selectedRaid._id) {
-            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'ID du raid manquant ou raid non sélectionné', life: 5000 });
+        if (!this.selectedGroup || !this.selectedGroup.raids[0]._id) {
+            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'ID du raid manquant ou groupe non sélectionné', life: 5000 });
             return;
         }
-        this.raidService.updateDrop(this.selectedRaid._id, bossName, lootId, selectedUser).subscribe({
+        this.raidService.updateDrop(this.selectedGroup.raids[0]._id, bossName, lootId, selectedUser).subscribe({
             next: () => {
                 this.messageService.add({ severity: 'success', summary: 'Drop mis à jour', detail: 'Drop assigné', life: 5000 });
             },
@@ -291,7 +253,47 @@ export class RaidListComponent implements OnInit, OnDestroy {
         });
     }
 
+    isAdmin(): boolean {
+        const token = this.authService.getToken();
+        if (token) {
+            try {
+                const decoded: User = jwtDecode(token);
+                return decoded.role === 'admin';
+            } catch (error) {
+                console.error('Erreur lors du décodage du token :', error);
+                return false;
+            }
+        }
+        return false;
+    }
+
+    openLoginModal() {
+        this.authService.showLoginModal();
+    }
+
+    getCurrentUser(): string | null {
+        return this.authService.getCurrentUser();
+    }
+
     private scrollToTop() {
         this.lootList?.nativeElement.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    public onLoginModalClose() {
+        try {
+            const token = this.authService.getToken();
+            this.isLoggedIn = !!token && !!this.authService.getCurrentUser();
+            this.username = this.authService.getCurrentUser();
+            if (this.isLoggedIn && (this.router.url === '/' || this.router.url === '')) {
+                this.router.navigate(['/raids']).catch(err => {
+                    console.error('Erreur lors de la navigation vers /raids :', JSON.stringify(err, null, 2));
+                });
+            }
+        } catch (error) {
+            console.error('Erreur lors de la vérification de l\'état de connexion :', error);
+            this.showLoginModal = false;
+            this.authService.logout();
+        }
+        this.showLoginModal = false;
     }
 }

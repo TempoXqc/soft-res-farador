@@ -1,89 +1,99 @@
-<div class="raid-container">
-    <table class="raid-table" *ngIf="getGroupedRaids().length > 0; else noRaids">
-        <thead>
-        <tr>
-            <th>Raid</th>
-            <th>Réservation</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let group of getGroupedRaids()">
-            <td>
-                <div class="raid-group">
+<div class="raid-container" *ngIf="getCurrentUser(); else notLoggedIn">
+    <p-toast></p-toast>
+    <div class="table-wrapper">
+        <table class="raid-table">
+            <thead>
+            <tr>
+                <th>Groupes</th>
+                <th>Raids</th>
+                <th>Réservation</th>
+            </tr>
+            </thead>
+            <tbody class="raid-table-body">
+            <tr *ngFor="let group of raidGroups">
+                <td>Réservation {{ group.groupId }}</td>
+                <td>
                     <div *ngFor="let raid of group.raids">
                         {{ raid.name }} ({{ raid.difficulty }}) - {{ raid.date | date:'medium' }}
                     </div>
-                </div>
-            </td>
-            <td>
-                <span class="icon-button" (click)="openModal(group.raids[0])">➤</span>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <ng-template #noRaids>
-        <p>Aucun raid disponible. Vérifiez la connexion à l'API ou la base de données.</p>
-    </ng-template>
-</div>
+                </td>
+                <td class="logs-icon">
+                    <button class="icon-button" (click)="openGroupDetails(group)" pTooltip="Voir les détails">➤</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
-<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-        <button class="close-icon" (click)="closeModal()">✕</button>
-        <div class="boss-list">
-            <h2>Bosses</h2>
-            <div *ngIf="selectedRaid && selectedRaid.bosses; else noBosses">
-                <div class="boss-item" *ngFor="let boss of selectedRaid.bosses"
-                     [class.selected]="boss === selectedBoss"
-                     (click)="selectBoss(boss)">
-                    <img class="boss-icon" [src]="getBossIconUrl(boss)" alt="{{ boss.name }} icon">
-                    <span class="boss-name">{{ boss.name }}</span>
+    <div *ngIf="raidGroups.length === 0">
+        Aucun raid disponible. Vérifiez la connexion à l'API ou la base de données.
+    </div>
+
+    <div class="modal-overlay" *ngIf="selectedGroup">
+        <div class="modal-content">
+            <button class="close-icon" (click)="closeGroupDetails()">✕</button>
+            <div class="boss-list">
+                <h3>Bosses</h3>
+                <div *ngIf="selectedGroup.bosses && selectedGroup.bosses.length > 0; else noBosses">
+                    <div class="boss-item" [class.selected]="boss === selectedBoss" *ngFor="let boss of selectedGroup.bosses" (click)="selectBoss(boss)">
+                        <img *ngIf="boss.iconUrl" class="boss-icon" [src]="boss.iconUrl" alt="{{ boss.name }}" />
+                        <span class="boss-name">{{ boss.name }}</span>
+                    </div>
                 </div>
+                <ng-template #noBosses>
+                    <p>Aucun boss disponible.</p>
+                </ng-template>
             </div>
-            <ng-template #noBosses>
-                <p>Aucun boss disponible.</p>
-            </ng-template>
-        </div>
-        <div class="loot-list" #lootList>
-            <table class="loot-table" *ngIf="selectedBoss">
-                <thead>
-                <tr>
-                    <th>Loot</th>
-                    <th>Slot</th>
-                    <th>Reserved By</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                <ng-container *ngFor="let group of getGroupedLoots()">
-                    <tr class="slot-header">
-                        <td colspan="4">{{ group.slot }}</td>
+
+            <div class="loot-list" *ngIf="selectedBoss">
+                <table class="loot-table">
+                    <thead>
+                    <tr>
+                        <th>Loot</th>
+                        <th>Slot</th>
+                        <th>Reserved By</th>
+                        <th>Drop</th>
+                        <th>Action</th>
                     </tr>
-                    <tr *ngFor="let loot of group.items">
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let loot of selectedBoss.loots">
                         <td>
-                            <img class="item-icon" [src]="getItemIconUrl(loot)" alt="{{ loot.itemName }} icon">
-                            <a class="loot-name q4" [attr.data-wowhead]="getLootDataWowhead(loot)">
-                                {{ loot.itemName }}
-                            </a>
+                            <img *ngIf="loot.iconUrl" class="item-icon" [src]="loot.iconUrl" alt="{{ loot.itemName }}" />
+                            <a class="loot-name" href="https://www.wowhead.com/item={{ loot.itemId }}" target="_blank">{{ loot.itemName }}</a>
                         </td>
                         <td class="loot-slot">{{ loot.slot }}</td>
                         <td>
-                            <ng-container *ngIf="loot.softReservedBy?.length > 0; else noReserve">
-                                    <span class="player-tag" *ngFor="let player of loot.softReservedBy; let isLast = last">
-                                        {{ player }}{{ isLast ? '' : ', ' }}
+                            <ng-container *ngIf="loot.softReservedBy && loot.softReservedBy.length > 0; else noReservation">
+                                    <span *ngFor="let player of loot.softReservedBy; let isLast = last">
+                                        <span class="player-tag" [class.current-user]="player === getCurrentUser()" [pTooltip]="player">
+                                            {{ player }}{{ isLast ? '' : ', ' }}
+                                        </span>
                                     </span>
                             </ng-container>
-                            <ng-template #noReserve>None</ng-template>
+                            <ng-template #noReservation>
+                                <span class="player-tag">None</span>
+                            </ng-template>
                         </td>
+                        <td class="loot-slot"></td>
                         <td>
-                            <button class="reserve-button" *ngIf="!isReservedByCurrentUser(loot)" (click)="reserveLoot(selectedBoss.name, loot)">Reserve</button>
-                            <button class="reserve-button" *ngIf="isReservedByCurrentUser(loot)" (click)="removeReservation(selectedBoss.name, loot)">Annuler</button>
+                            <button class="reserve-button" (click)="addReservation(selectedBoss.name, loot.itemId)"
+                                    *ngIf="!loot.softReservedBy.includes(getCurrentUser())">
+                                Reserve
+                            </button>
+                            <button class="reserve-button" (click)="removeReservation(selectedBoss.name, loot.itemId)"
+                                    *ngIf="loot.softReservedBy.includes(getCurrentUser())">
+                                Annuler
+                            </button>
                         </td>
                     </tr>
-                </ng-container>
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
-<p-toast></p-toast>
+<ng-template #notLoggedIn>
+    <app-login-modal [visible]="showLoginModal" (visibleChange)="onLoginModalClose()"></app-login-modal>
+</ng-template>

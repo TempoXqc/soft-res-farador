@@ -13,16 +13,14 @@
 label {
   display: block;
   margin-bottom: 0.7rem;
-  color: #ccc;
+  color: #000;
   font-weight: 500;
 }
 
 input {
   width: 100%;
   padding: 0.7rem;
-  background-color: #1e1e1e;
-  border: 1px solid #444;
-  color: #e0e0e0;
+  color: #ccc;
   border-radius: 8px;
 }
 
@@ -32,6 +30,10 @@ input {
   border: none;
   padding: 8px 16px;
   border-radius: 8px;
+  align-items: center;
+  display: flex;
+  text-align: center;
+  justify-content: center;
 }
 
 .p-button:hover {

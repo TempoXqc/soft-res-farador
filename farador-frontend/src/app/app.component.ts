@@ -3,12 +3,15 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { filter } from 'rxjs/operators';
-import { LoginModalComponent } from "./auth/login-modal.component";
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { ReactiveFormsModule } from '@angular/forms';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
     selector: 'app-root',
     standalone: true,
-    imports: [CommonModule, RouterOutlet, LoginModalComponent],
+    imports: [CommonModule, RouterOutlet, DialogModule, InputTextModule, ReactiveFormsModule],
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss']
 })
@@ -22,19 +25,40 @@ export class AppComponent implements OnInit, OnDestroy {
     constructor(
         private authService: AuthService,
         private router: Router,
-        private renderer: Renderer2
+        private renderer: Renderer2,
+        private cdr: ChangeDetectorRef
     ) {}
 
     ngOnInit() {
         console.log('AppComponent initialisé, showLoginModal :', this.showLoginModal);
-        this.checkLoginStatus();
-        this.setupDocumentClickListener();
+        this.authService.isLoggedIn.subscribe(isLoggedIn => {
+            this.isLoggedIn = isLoggedIn;
+            this.username = this.authService.getCurrentUser();
+            console.log('État de connexion mis à jour :', isLoggedIn, 'Utilisateur :', this.username);
+            if (isLoggedIn && (this.router.url === '/' || this.router.url === '')) {
+                console.log('Redirection vers /raids après connexion');
+                this.router.navigate(['/raids']).catch(err => {
+                    console.error('Erreur lors de la navigation vers /raids :', JSON.stringify(err, null, 2));
+                });
+            } else if (!isLoggedIn && this.router.url.includes('/raids')) {
+                // Ouvre la modale si l'utilisateur est déconnecté et sur une page protégée
+                this.authService.showLoginModal();
+            }
+            this.cdr.detectChanges(); // Force la détection des changements
+        });
+        this.authService.loginModalState$.subscribe(state => {
+            this.showLoginModal = state;
+            console.log('État de la modale de connexion mis à jour :', state);
+        });
         this.router.events.pipe(
             filter(event => event instanceof NavigationEnd)
         ).subscribe(() => {
             console.log('Navigation terminée, URL actuelle :', this.router.url);
-            this.checkLoginStatus();
+            if (!this.isLoggedIn && this.router.url.includes('/raids')) {
+                this.authService.showLoginModal();
+            }
         });
+        this.setupDocumentClickListener();
     }
 
     ngOnDestroy() {
@@ -43,21 +67,19 @@ export class AppComponent implements OnInit, OnDestroy {
         }
     }
 
-    checkLoginStatus() {
+    logout() {
         try {
-            this.isLoggedIn = !!this.authService.getCurrentUser();
-            this.username = this.authService.getCurrentUser();
-            console.log('État de connexion :', JSON.stringify({ isLoggedIn: this.isLoggedIn, username: this.username }, null, 2));
-            if (this.isLoggedIn && (this.router.url === '/' || this.router.url === '')) {
-                console.log('Utilisateur connecté, tentative de redirection vers /raids');
-                this.router.navigate(['/raids']).catch(err => {
-                    console.error('Erreur lors de la navigation vers /raids :', JSON.stringify(err, null, 2));
-                });
-            }
-        } catch (error) {
-            console.error('Erreur lors de la vérification de l\'état de connexion :', error);
+            console.log('Tentative de déconnexion');
+            this.authService.logout();
             this.isLoggedIn = false;
             this.username = null;
+            this.showDropdown = false;
+            console.log('Déconnexion réussie');
+            this.router.navigate(['/']).then(() => {
+                this.authService.showLoginModal(); // Ouvre la modale après déconnexion
+            });
+        } catch (error) {
+            console.error('Erreur lors de la déconnexion :', error);
         }
     }
 
@@ -77,20 +99,6 @@ export class AppComponent implements OnInit, OnDestroy {
         });
     }
 
-    logout() {
-        try {
-            console.log('Tentative de déconnexion');
-            this.authService.logout();
-            this.isLoggedIn = false;
-            this.username = null;
-            this.showDropdown = false;
-            console.log('Déconnexion réussie');
-            this.router.navigate(['/']);
-        } catch (error) {
-            console.error('Erreur lors de la déconnexion :', error);
-        }
-    }
-
     navigateToBisLoot() {
         console.log('Navigation vers BIS Loot');
         window.open('https://www.wowhead.com/bis', '_blank');
@@ -104,16 +112,5 @@ export class AppComponent implements OnInit, OnDestroy {
     navigateToRaiderIo() {
         console.log('Navigation vers Raider.IO');
         window.open('https://raider.io', '_blank');
-    }
-
-    logLoginClick() {
-        console.log('Clic sur le bouton Connexion, ouverture de la modale, showLoginModal :', true);
-        this.showLoginModal = true;
-    }
-
-    onLoginModalClose() {
-        console.log('Modale de connexion fermée, showLoginModal :', false);
-        this.showLoginModal = false;
-        this.checkLoginStatus();
     }
 }

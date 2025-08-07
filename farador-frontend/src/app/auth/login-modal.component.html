@@ -1,4 +1,4 @@
-<p-dialog header="Connexion" [(visible)]="visible" (visibleChange)="visibleChange.emit($event)" [modal]="true" [style]="{width: '400px'}" (onHide)="closeModal()">
+<p-dialog header="Connexion" [(visible)]="visible" (visibleChange)="visibleChange.emit($event)" [modal]="true" [style]="{width: '400px'}" closable="false">
     <div class="p-field">
         <label for="username">Nom du personnage</label>
         <input pInputText id="username" type="text" [(ngModel)]="username" placeholder="Entrez votre nom de personnage" />
