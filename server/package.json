@@ -2,7 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "scripts": {
-    "start": "ts-node main.ts"
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "start-server": "node dist/main.js",
+    "dev": "ts-node main.ts"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",

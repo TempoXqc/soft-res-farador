@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "scripts": {
     "start": "cd server && npm start",
-    "start-server": "cd server && npm start",
+    "start-server": "cd server && npm run start-server",
     "start-frontend": "cd frontend && npm start",
     "import": "cd server && ts-node importBlizzardData.ts",
     "dev": "concurrently \"npm run start-frontend\" \"npm run start-server\"",
-    "build-server": "cd server && npm install"
+    "build-server": "cd server && npm install && npm run build"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
