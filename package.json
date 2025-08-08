@@ -1,5 +1,5 @@
 {
-  "name": "soft-res-farador",
+  "name": "farador-app",
   "version": "1.0.0",
   "scripts": {
     "start": "cd frontend && npm start",

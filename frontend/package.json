@@ -1,5 +1,5 @@
 {
-  "name": "farador-frontend",
+  "name": "frontend",
   "version": "1.0.0",
   "scripts": {
     "ng": "ng",
