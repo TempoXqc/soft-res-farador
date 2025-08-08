@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { RaidListComponent } from './raids/raid-list/raid-list.component';
+import { RaidListComponent } from './raids/raid-list.component';
 
 export const routes: Routes = [
     { path: 'raids', component: RaidListComponent },

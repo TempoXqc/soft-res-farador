@@ -13,16 +13,12 @@ interface CustomJwtPayload extends JwtPayload {
 export const getRaids = async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split('Bearer ')[1];
     if (!token) {
-        console.log('❌ Aucun token fourni pour getRaids');
         return res.status(401).json({ message: 'Aucun token fourni' });
     }
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as CustomJwtPayload;
-        console.log('🔐 Token décodé pour getRaids :', decoded);
-
         const raids = await RaidModel.find();
-        console.log('✅ Raids trouvés :', raids);
         res.json(raids);
     } catch (error) {
         if (error instanceof jwt.JsonWebTokenError) {
@@ -36,15 +32,12 @@ export const getRaids = async (req: Request, res: Response) => {
 export const createRaid = async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split('Bearer ')[1];
     if (!token) {
-        console.log('❌ Aucun token fourni');
         return res.status(401).json({ message: 'Aucun token fourni' });
     }
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as CustomJwtPayload;
-        console.log('🔐 Token décodé :', decoded);
         if (decoded.role !== 'admin') {
-            console.log('❌ Utilisateur non autorisé :', { decodedUsername: decoded.username });
             return res.status(403).json({ message: 'Accès réservé aux administrateurs' });
         }
 
@@ -55,9 +48,6 @@ export const createRaid = async (req: Request, res: Response) => {
 
         const raid = new RaidModel(raidData);
         await raid.save();
-        console.log('✅ Raid créé :', raid);
-
-        // Emit WebSocket event
         const io = (req as any).io as Server;
         io.emit('raidCreated', raid);
 
@@ -72,37 +62,29 @@ export const updateReservation = async (req: Request, res: Response) => {
     const { raidId, bossName, lootId } = req.params;
     const { username, add } = req.body;
 
-    console.log('📥 Requête de réservation reçue :', { raidId, bossName, lootId, username, add });
-
     const token = req.headers.authorization?.split('Bearer ')[1];
     if (!token) {
-        console.log('❌ Aucun token fourni');
         return res.status(401).json({ message: 'Aucun token fourni' });
     }
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as CustomJwtPayload;
-        console.log('🔐 Token décodé :', decoded);
         if (decoded.username !== username) {
-            console.log('❌ Utilisateur non autorisé :', { decodedUsername: decoded.username, requestedUsername: username });
             return res.status(403).json({ message: 'Action réservée à l’utilisateur concerné' });
         }
 
         const raid = await RaidModel.findById(raidId);
         if (!raid) {
-            console.log('❌ Raid non trouvé :', raidId);
             return res.status(404).json({ message: 'Raid non trouvé' });
         }
 
         const boss = raid.bosses.find(b => b.name === bossName);
         if (!boss) {
-            console.log('❌ Boss non trouvé :', { raidId, bossName });
             return res.status(404).json({ message: 'Boss non trouvé' });
         }
 
         const loot = boss.loots.find(l => l.id === lootId);
         if (!loot) {
-            console.log('❌ Loot non trouvé :', { raidId, bossName, lootId });
             return res.status(404).json({ message: 'Loot non trouvé' });
         }
 
@@ -117,24 +99,18 @@ export const updateReservation = async (req: Request, res: Response) => {
         }
 
         if (add && reservedCount >= 2) {
-            console.log('❌ Limite de 2 réservations atteinte pour :', username);
             return res.status(403).json({ message: 'Limite de 2 réservations atteinte' });
         }
 
         if (add) {
             if (!loot.softReservedBy.includes(username)) {
                 loot.softReservedBy.push(username);
-                console.log('✅ Ajout de la réservation :', { username, lootId });
             }
         } else {
             loot.softReservedBy = loot.softReservedBy.filter((u: string) => u !== username);
-            console.log('✅ Suppression de la réservation :', { username, lootId });
         }
 
         await raid.save();
-        console.log('✅ Raid mis à jour :', raid._id);
-
-        // Emit WebSocket event
         const io = (req as any).io as Server;
         io.emit('raidUpdated', raid);
 
@@ -149,25 +125,19 @@ export const updateGroupReservation = async (req: Request, res: Response) => {
     const { groupId } = req.params;
     const { bossName, itemId, username, add } = req.body;
 
-    console.log('📥 Requête de réservation de groupe reçue :', { groupId, bossName, itemId, username, add });
-
     const token = req.headers.authorization?.split('Bearer ')[1];
     if (!token) {
-        console.log('❌ Aucun token fourni');
         return res.status(401).json({ message: 'Aucun token fourni' });
     }
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as CustomJwtPayload;
-        console.log('🔐 Token décodé :', decoded);
         if (decoded.username !== username) {
-            console.log('❌ Utilisateur non autorisé :', { decodedUsername: decoded.username, requestedUsername: username });
             return res.status(403).json({ message: 'Action réservée à l’utilisateur concerné' });
         }
 
         const raids = await RaidModel.find({ groupId: parseInt(groupId) });
         if (!raids.length) {
-            console.log('❌ Groupe non trouvé :', groupId);
             return res.status(404).json({ message: 'Groupe non trouvé' });
         }
 
@@ -181,10 +151,8 @@ export const updateGroupReservation = async (req: Request, res: Response) => {
                 }
             }
         }
-        console.log('📊 Nombre de réservations de l’utilisateur :', reservedCount);
 
         if (add && reservedCount >= 2) {
-            console.log('❌ Limite de 2 réservations atteinte pour :', username);
             return res.status(403).json({ message: 'Limite de 2 réservations par groupe atteinte' });
         }
 
@@ -200,25 +168,19 @@ export const updateGroupReservation = async (req: Request, res: Response) => {
             if (add) {
                 if (!loot.softReservedBy.includes(username)) {
                     loot.softReservedBy.push(username);
-                    console.log('✅ Ajout de la réservation :', { username, itemId });
                     updated = true;
                 }
             } else {
                 loot.softReservedBy = loot.softReservedBy.filter((u: string) => u !== username);
-                console.log('✅ Suppression de la réservation :', { username, itemId });
                 updated = true;
             }
 
             await raid.save();
-            console.log('✅ Raid mis à jour dans le groupe :', raid._id);
-
-            // Émettre l'événement WebSocket
             const io = (req as any).io as Server;
             io.emit('raidUpdated', raid);
         }
 
         if (!updated) {
-            console.log('❌ Aucun loot ou boss correspondant trouvé pour :', { bossName, itemId });
             return res.status(404).json({ message: 'Loot ou boss non trouvé' });
         }
 
@@ -232,51 +194,41 @@ export const updateGroupReservation = async (req: Request, res: Response) => {
 export const updateDropInGroup = async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split('Bearer ')[1];
     if (!token) {
-        console.log('❌ Aucun token fourni');
         return res.status(401).json({ message: 'Aucun token fourni' });
     }
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as CustomJwtPayload;
-        console.log('🔐 Token décodé :', decoded);
         if (decoded.role !== 'admin') {
-            console.log('❌ Utilisateur non autorisé :', { decodedUsername: decoded.username });
             return res.status(403).json({ message: 'Accès réservé aux administrateurs' });
         }
 
         const { groupId } = req.params;
         const { bossName, itemId, droppedTo } = req.body;
-        console.log('Paramètres reçus pour updateDropInGroup :', { groupId, bossName, itemId, droppedTo });
 
         const raids = await RaidModel.find({ groupId });
-        console.log('Raids trouvés :', raids);
 
         if (!raids.length) {
-            console.log('❌ Aucun raid trouvé pour le groupe :', groupId);
             return res.status(404).json({ message: 'Aucun raid trouvé pour ce groupe' });
         }
 
         let updated = false;
         for (const raid of raids) {
             const boss = raid.bosses.find(b => b.name === bossName);
-            console.log('Boss trouvé :', boss);
             if (!boss) continue;
 
             const loot = boss.loots.find(l => l.itemId === itemId);
-            console.log('Loot trouvé :', loot);
             if (!loot) continue;
 
             loot.droppedTo = Array.isArray(droppedTo) ? droppedTo : [];
             updated = true;
             await raid.save();
-            console.log('✅ Raid mis à jour dans le groupe pour droppedTo :', raid._id);
 
             const io = (req as any).io as Server;
             io.emit('raidUpdated', raid);
         }
 
         if (!updated) {
-            console.log('❌ Aucun loot ou boss correspondant trouvé pour :', { bossName, itemId });
             return res.status(404).json({ message: 'Loot ou boss non trouvé' });
         }
 
@@ -286,3 +238,50 @@ export const updateDropInGroup = async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Erreur lors de la mise à jour du drop', error });
     }
 };
+
+export const updateReservedInGroup = async (req: Request, res: Response) => {
+    const token = req.headers.authorization?.split('Bearer ')[1];
+    if (!token) {
+        return res.status(401).json({ message: 'Aucun token fourni' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as CustomJwtPayload;
+        if (decoded.role !== 'admin') {
+            return res.status(403).json({ message: 'Accès réservé aux administrateurs' });
+        }
+
+        const { groupId } = req.params;
+        const { bossName, itemId, softReservedBy } = req.body;
+
+        const raids = await RaidModel.find({ groupId });
+
+        if (!raids.length) {
+            return res.status(404).json({ message: 'Aucun raid trouvé pour ce groupe' });
+        }
+
+        let updated = false;
+        for (const raid of raids) {
+            const boss = raid.bosses.find(b => b.name === bossName);
+            if (!boss) continue;
+
+            const loot = boss.loots.find(l => l.id === itemId);
+            if (!loot) continue;
+
+            loot.softReservedBy = Array.isArray(softReservedBy) ? softReservedBy : [];
+            updated = true;
+            await raid.save();
+            const io = (req as any).io as Server;
+            io.emit('raidUpdated', raid);
+        }
+
+        if (!updated) {
+            return res.status(404).json({ message: 'Loot ou boss non trouvé' });
+        }
+
+        res.json({ message: 'Réservations mises à jour pour le groupe avec succès' });
+    } catch (error) {
+        console.error('❌ Erreur lors de la mise à jour des réservations :', error);
+        res.status(500).json({ message: 'Erreur lors de la mise à jour des réservations', error });
+    }
+}

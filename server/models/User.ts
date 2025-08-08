@@ -5,7 +5,9 @@ const UserSchema = new mongoose.Schema({
     password: String,
     class: String,
     role: String,
-    armoryUrl: String
+    url_armory: String,
+    url_bis: String,
+    url_io: String
 });
 
 export default mongoose.model('User', UserSchema);

@@ -1,19 +1,19 @@
 import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import { RaidService } from '../../services/raid.service';
-import { AuthService } from '../../services/auth.service';
+import { RaidService } from '../services/raid.service';
+import { AuthService } from '../services/auth.service';
 import { MessageService } from 'primeng/api';
 import { io, Socket } from 'socket.io-client';
 import { TooltipModule } from 'primeng/tooltip';
 import { TableModule } from 'primeng/table';
 import { DropdownModule } from 'primeng/dropdown';
-import { UserService } from '../../services/user.service';
-import { Raid } from '../../models/raid';
-import { User } from '../../models/user';
+import { UserService } from '../services/user.service';
+import { Raid } from '../models/raid';
+import { User } from '../models/user';
 import { ToastModule } from 'primeng/toast';
 import { jwtDecode } from 'jwt-decode';
-import {LoginModalComponent} from "../../auth/login-modal.component";
+import {LoginModalComponent} from "../auth/login-modal.component";
 import {Router} from "@angular/router";
 import {Button} from "primeng/button";
 import {DialogModule} from "primeng/dialog";
@@ -253,7 +253,6 @@ export class RaidListComponent implements OnInit, OnDestroy {
 
     loadRaids() {
         if (!this.getCurrentUser()) {
-            console.log('Utilisateur non connecté, chargement des raids annulé.');
             this.raids = [];
             this.raidGroups = [];
             return;
@@ -290,13 +289,11 @@ export class RaidListComponent implements OnInit, OnDestroy {
     loadUsers() {
         this.userService.getUsers().subscribe({
             next: (users) => {
-                console.log('Utilisateurs chargés :', users);
                 this.users = users;
                 this.userOptions = users.map(user => ({
                     label: user.username,
                     value: user.username
                 }));
-                console.log('userOptions :', this.userOptions);
             },
             error: (err) => {
                 console.error('Erreur lors du chargement des utilisateurs :', err);
@@ -311,7 +308,6 @@ export class RaidListComponent implements OnInit, OnDestroy {
         });
 
         this.socket.on('raidUpdated', (updatedRaid: Raid) => {
-            console.log('📡 Raid mis à jour via WebSocket :', JSON.stringify(updatedRaid, null, 2));
             const index = this.raids.findIndex(r => r._id === updatedRaid._id);
             if (index !== -1) {
                 this.raids[index] = updatedRaid;
@@ -345,14 +341,11 @@ export class RaidListComponent implements OnInit, OnDestroy {
             return;
         }
         if (!this.selectedGroup) {
-            console.log('Aucun groupe sélectionné', { selectedGroup: this.selectedGroup });
             this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Aucun groupe sélectionné', life: 5000 });
             return;
         }
-        console.log('Appel de reserveLootInGroup pour ajout', { groupId: this.selectedGroup.groupId, bossName, lootId, user: currentUser });
         this.raidService.reserveLootInGroup(this.selectedGroup.groupId, bossName, lootId, currentUser, true).subscribe({
             next: () => {
-                console.log('Réservation ajoutée avec succès');
                 this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Réservation ajoutée', life: 5000 });
             },
             error: (err: any) => {
@@ -369,14 +362,11 @@ export class RaidListComponent implements OnInit, OnDestroy {
             return;
         }
         if (!this.selectedGroup) {
-            console.log('Aucun groupe sélectionné', { selectedGroup: this.selectedGroup });
             this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Aucun groupe sélectionné', life: 5000 });
             return;
         }
-        console.log('Appel de reserveLootInGroup pour suppression', { groupId: this.selectedGroup.groupId, bossName, lootId, user: currentUser });
         this.raidService.reserveLootInGroup(this.selectedGroup.groupId, bossName, lootId, currentUser, false).subscribe({
             next: () => {
-                console.log('Réservation supprimée avec succès');
                 this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Réservation supprimée', life: 5000 });
             },
             error: (err: any) => {
@@ -397,7 +387,6 @@ export class RaidListComponent implements OnInit, OnDestroy {
                         if (!loot.droppedTo) {
                             this.raidService.reserveLootInGroup(newGroupId, boss.name, loot.itemId, user, true).subscribe({
                                 next: () => {
-                                    console.log(`Réservation auto pour ${user} sur item ${loot.itemName} dans le groupe ${newGroupId}`);
                                 },
                                 error: (err: any) => {
                                     console.error('Erreur lors de la réservation auto :', err);
@@ -427,11 +416,10 @@ export class RaidListComponent implements OnInit, OnDestroy {
     selectBoss(boss: any) {
         this.selectedBoss = boss;
         this.cdr.detectChanges();
-        setTimeout(() => this.scrollToTop(), 0); // Scroll après rendu
+        setTimeout(() => this.scrollToTop(), 0);
     }
 
     updateDrop(groupId: number, bossName: string, itemId: string, droppedTo: string[]) {
-        console.log('Appel de updateDrop avec :', { groupId, bossName, itemId, droppedTo });
         this.raidService.updateDrop(groupId, bossName, itemId, droppedTo).subscribe({
             next: () => {
                 this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Drop mis à jour avec succès' });
@@ -440,6 +428,31 @@ export class RaidListComponent implements OnInit, OnDestroy {
             error: (err) => {
                 console.error('Erreur lors de la mise à jour du drop :', JSON.stringify(err, null, 2));
                 this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de mettre à jour le drop : ' + (err.statusText || err.message) });
+            }
+        });
+    }
+
+    updateReservedBy(groupId: number, bossName: string, itemId: string, softReservedBy: string[]) {
+        const uniqueReservedBy = [...new Set(softReservedBy)];
+        this.raidService.updateReserved(groupId, bossName, itemId, uniqueReservedBy).subscribe({
+            next: () => {
+                this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Réservations mises à jour avec succès' });
+                const raid = this.raids.find(r => r.groupId === groupId);
+                if (raid) {
+                    const boss = raid.bosses?.find(b => b.name === bossName);
+                    if (boss) {
+                        const loot = boss.loots?.find(l => l.id === itemId);
+                        if (loot) {
+                            loot.softReservedBy = softReservedBy;
+                        }
+                    }
+                }
+                this.groupRaidsByGroupId();
+                this.cdr.detectChanges();
+            },
+            error: (err) => {
+                console.error('Erreur lors de la mise à jour des réservations :', JSON.stringify(err, null, 2));
+                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de mettre à jour les réservations : ' + (err.statusText || err.message) });
             }
         });
     }
@@ -453,7 +466,6 @@ export class RaidListComponent implements OnInit, OnDestroy {
     }
 
     openCreateRaidModal() {
-        console.log('Ouverture de la modale de création de raid');
         this.newRaid = {
             name: 'Manaforge Omega',
             difficulty: 'Normal',
@@ -466,7 +478,6 @@ export class RaidListComponent implements OnInit, OnDestroy {
     }
 
     closeCreateRaidModal() {
-        console.log('Fermeture de la modale de création de raid');
         this.showCreateRaidModal = false;
         this.newRaid = { name: 'Manaforge Omega', difficulty: 'Normal', date: null, groupId: 1, bosses: MANAFORGE_OMEGA_BOSSES };
         this.cdr.detectChanges();
@@ -491,10 +502,8 @@ export class RaidListComponent implements OnInit, OnDestroy {
         // Créer le premier raid
         this.raidService.createRaid(this.newRaid).subscribe({
             next: (raid) => {
-                console.log('Premier raid créé :', raid);
                 this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Premier raid créé avec succès' });
 
-                // Créer le second raid pour le mardi suivant
                 const nextTuesday = new Date(raidDate);
                 nextTuesday.setDate(raidDate.getDate() + 7); // Ajoute 7 jours pour le mardi suivant
                 nextTuesday.setHours(20, 0, 0, 0);
@@ -509,7 +518,6 @@ export class RaidListComponent implements OnInit, OnDestroy {
 
                 this.raidService.createRaid(secondRaid).subscribe({
                     next: (secondRaid) => {
-                        console.log('Second raid créé :', secondRaid);
                         this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Second raid créé avec succès' });
                         this.loadRaids();
                         this.raidCreated.emit();

@@ -4,7 +4,7 @@ import {
     createRaid,
     updateReservation,
     updateGroupReservation,
-    updateDropInGroup
+    updateDropInGroup, updateReservedInGroup
 } from '../controllers/raids.controller';
 
 const router = express.Router();
@@ -14,5 +14,6 @@ router.post('/', createRaid);
 router.put('/:raidId/bosses/:bossName/loots/:lootId/reserve', updateReservation);
 router.put('/group/:groupId/reserve', updateGroupReservation);
 router.put('/group/:groupId/drop', updateDropInGroup);
+router.put('/group/:groupId/reserved', updateReservedInGroup);
 
 export default router;

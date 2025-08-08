@@ -89,50 +89,66 @@
                             <a class="loot-name" href="https://www.wowhead.com/item={{ loot.itemId }}" target="_blank">{{ loot.itemName }}</a>
                         </td>
                         <td class="loot-slot">{{ loot.slot }}</td>
-                        <td>
-                            <ng-container *ngIf="loot.softReservedBy && loot.softReservedBy.length > 0; else noReservation">
-                                    <span *ngFor="let player of loot.softReservedBy; let isLast = last">
-                                        <span class="player-tag" [class.current-user]="player === getCurrentUser()" [pTooltip]="player">
-                                            {{ player }}{{ isLast ? '' : ', ' }}
-                                        </span>
-                                    </span>
-                            </ng-container>
-                            <ng-template #noReservation>
-                                <span class="player-tag"></span>
-                            </ng-template>
+                        <td *ngIf="isAdmin(); else nonAdminReserved">
+                            <p-multiSelect
+                                    [options]="userOptions"
+                                    [(ngModel)]="loot.softReservedBy"
+                                    (onChange)="updateReservedBy(selectedGroup.groupId, selectedBoss.name, loot.id, loot.softReservedBy)"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    display="chip"
+                                    placeholder="Sélectionner des utilisateurs"
+                                    appendTo="body"
+                                    [style]="{'width': '100%'}"
+                                    [panelStyle]="{'min-width': '300px'}"
+                                    [showClear]="true">
+                            </p-multiSelect>
                         </td>
+                        <ng-template #nonAdminReserved>
+                            <td>
+                                <ng-container *ngFor="let player of loot.softReservedBy; let isLast = last">
+                                    <span class="player-tag" [ngClass]="{'current-user': player === username}">
+                                        {{ player }}{{ isLast ? '' : ', ' }}
+                                    </span>
+                                </ng-container>
+                                <span *ngIf="!loot.softReservedBy || loot.softReservedBy.length === 0"></span>
+                            </td>
+                        </ng-template>
                         <td>
                             <ng-container *ngIf="isAdmin(); else dropText">
                                 <p-multiSelect
                                         [options]="userOptions"
                                         [(ngModel)]="loot.droppedTo"
                                         (onChange)="updateDrop(selectedGroup.groupId, selectedBoss.name, loot.itemId, $event.value)"
-                                        placeholder="Sélectionner des utilisateurs"
-                                        [showClear]="true"
                                         optionLabel="label"
-                                        styleClass="multiselect-custom">
-                                    <ng-template let-user pTemplate="item">
-                                        {{ user.label }}
-                                    </ng-template>
+                                        optionValue="value"
+                                        display="chip"
+                                        placeholder="Sélectionner des utilisateurs"
+                                        appendTo="body"
+                                        [style]="{'width': '100%'}"
+                                        [panelStyle]="{'min-width': '300px'}"
+                                        [showClear]="true">
                                 </p-multiSelect>
                             </ng-container>
                             <ng-template #dropText>
                                 <ng-container *ngIf="Array.isArray(loot.droppedTo) && loot.droppedTo.length">
-                                    {{ loot.droppedTo.join(', ') }}
+                                    <span class="player-tag"> {{ loot.droppedTo.join(', ') }}</span>
                                 </ng-container>
                                 <ng-container *ngIf="!Array.isArray(loot.droppedTo) || !loot.droppedTo.length">
-                                    {{ loot.droppedTo || 'None' }}
+                                    <span class="player-tag"> {{ loot.droppedTo || '' }} </span>
                                 </ng-container>
                             </ng-template>
                         </td>
-                        <button class="reserve-button" (click)="addReservation(selectedBoss.name, loot.itemId)"
-                                *ngIf="!loot.softReservedBy.includes(getCurrentUser())">
-                            Reserve
-                        </button>
-                        <button class="reserve-button cancel-button" (click)="removeReservation(selectedBoss.name, loot.itemId)"
-                                *ngIf="loot.softReservedBy.includes(getCurrentUser())">
-                            Annuler
-                        </button>
+                        <td>
+                            <button class="reserve-button" (click)="addReservation(selectedBoss.name, loot.itemId)"
+                                    *ngIf="!loot.softReservedBy.includes(getCurrentUser())">
+                                Reserve
+                            </button>
+                            <button class="reserve-button cancel-button" (click)="removeReservation(selectedBoss.name, loot.itemId)"
+                                    *ngIf="loot.softReservedBy.includes(getCurrentUser())">
+                                Annuler
+                            </button>
+                        </td>
                     </tr>
                     </tbody>
                 </table>

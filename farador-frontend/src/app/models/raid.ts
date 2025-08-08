@@ -13,6 +13,7 @@ export interface Boss {
 }
 
 export interface Loot {
+    id: string;
     itemId: string;
     itemName: string;
     slot: string;
