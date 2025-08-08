@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
+import {environment} from "../../environments/environment";
 
 interface JwtPayload {
     username: string;
@@ -34,10 +35,7 @@ export class AuthService {
     }
 
     login(username: string, password: string): Observable<any> {
-        return this.http.post<any>('http://localhost:3000/api/auth/login', {
-            username,
-            password
-        }).pipe(
+        return this.http.post<any>(`${environment.apiUrl}/auth/login`, { username, password }).pipe(
             tap(res => {
                 localStorage.setItem('token', res.token);
                 this.isLoggedInSubject.next(true);

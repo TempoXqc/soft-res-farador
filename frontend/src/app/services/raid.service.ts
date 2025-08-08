@@ -3,12 +3,13 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Raid } from '../models/raid';
+import {environment} from "../../environments/environment";
 
 @Injectable({
     providedIn: 'root'
 })
 export class RaidService {
-    private apiUrl = 'http://localhost:3000/api/raids';
+    private apiUrl = `${environment.apiUrl}/raids`;
 
     constructor(private http: HttpClient) {}
 

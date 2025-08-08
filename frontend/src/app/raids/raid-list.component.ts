@@ -20,6 +20,7 @@ import {DialogModule} from "primeng/dialog";
 import {CalendarModule} from "primeng/calendar";
 import {FormGroup } from '@angular/forms';
 import {MultiSelectModule} from "primeng/multiselect";
+import {environment} from "../../environments/environment";
 
 const MANAFORGE_OMEGA_BOSSES = [
     {
@@ -221,7 +222,7 @@ export class RaidListComponent implements OnInit, OnDestroy {
         private cdr: ChangeDetectorRef,
         private router: Router,
     ) {
-        this.socket = io('http://localhost:3000', { reconnection: true, reconnectionAttempts: 5 });
+        this.socket = io(environment.socketUrl, { reconnection: true, reconnectionAttempts: 5 });
     }
 
     ngOnInit() {
