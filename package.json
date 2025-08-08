@@ -2,7 +2,7 @@
   "name": "soft-res-farador",
   "version": "1.0.0",
   "scripts": {
-    "start": "cd farador-frontend && npm start",
+    "start": "cd frontend && npm start",
     "start:server": "cd server && npm start",
     "import": "cd server && ts-node importBlizzardData.ts",
     "dev": "concurrently \"npm run start\" \"npm run start:server\""
