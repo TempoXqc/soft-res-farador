@@ -1,5 +1,5 @@
 export const environment = {
     production: true,
-    apiUrl: 'https://api.farador.net/api',
-    socketUrl: 'https://api.farador.net'
+    apiUrl: 'https://soft-res-farador.onrender.com',
+    socketUrl: 'https://soft-res-farador.onrender.com'
 };
