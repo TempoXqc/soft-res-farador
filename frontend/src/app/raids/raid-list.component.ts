@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { RaidService } from '../services/raid.service';
 import { AuthService } from '../services/auth.service';
 import { MessageService } from 'primeng/api';
@@ -12,15 +12,14 @@ import { UserService } from '../services/user.service';
 import { Raid } from '../models/raid';
 import { User } from '../models/user';
 import { ToastModule } from 'primeng/toast';
-import { jwtDecode } from 'jwt-decode';
 import {LoginModalComponent} from "../auth/login-modal.component";
 import {Router} from "@angular/router";
 import {Button} from "primeng/button";
 import {DialogModule} from "primeng/dialog";
 import {CalendarModule} from "primeng/calendar";
-import {FormGroup } from '@angular/forms';
 import {MultiSelectModule} from "primeng/multiselect";
 import {environment} from "../../environments/environment";
+import {jwtDecode} from "jwt-decode";
 
 const MANAFORGE_OMEGA_BOSSES = [
     {
@@ -496,17 +495,15 @@ export class RaidListComponent implements OnInit, OnDestroy {
             return;
         }
 
-        // Forcer l'heure à 20h00 pour le premier raid
         raidDate.setHours(20, 0, 0, 0);
         this.newRaid.date = raidDate;
 
-        // Créer le premier raid
         this.raidService.createRaid(this.newRaid).subscribe({
             next: (raid) => {
                 this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Premier raid créé avec succès' });
 
                 const nextTuesday = new Date(raidDate);
-                nextTuesday.setDate(raidDate.getDate() + 7); // Ajoute 7 jours pour le mardi suivant
+                nextTuesday.setDate(raidDate.getDate() + 7);
                 nextTuesday.setHours(20, 0, 0, 0);
 
                 const secondRaid = {
@@ -557,6 +554,108 @@ export class RaidListComponent implements OnInit, OnDestroy {
             this.authService.logout();
         }
         this.showLoginModal = false;
+    }
+
+    public isLocked(groupId: number): boolean {
+        const group = this.raidGroups.find(g => g.groupId === groupId);
+        if (!group || !group.raids || group.raids.length === 0) {
+            return false;
+        }
+        const earliestRaid = group.raids.reduce((min, raid) =>
+            new Date(raid.date) < new Date(min.date) ? raid : min, group.raids[0]);
+        const earliestRaidDate = new Date(earliestRaid.date);
+        const lockTime = new Date(earliestRaidDate);
+        lockTime.setHours(18, 0, 0, 0);
+        return new Date() > lockTime;
+    }
+
+    public getLockDate(groupId: number): string | null {
+        const group = this.raidGroups.find(g => g.groupId === groupId);
+        if (!group || !group.raids || group.raids.length === 0) {
+            return null;
+        }
+        const earliestRaid = group.raids.reduce((min, raid) =>
+            new Date(raid.date) < new Date(min.date) ? raid : min, group.raids[0]);
+        const earliestRaidDate = new Date(earliestRaid.date);
+        const lockTime = new Date(earliestRaidDate);
+        lockTime.setHours(18, 0, 0, 0);
+        return `${lockTime.getDate().toString().padStart(2, '0')}/${(lockTime.getMonth() + 1).toString().padStart(2, '0')}/${lockTime.getFullYear()}`;
+    }
+
+    public reserveLoot(groupId: number, bossName: string, itemId: string) {
+        const currentUser = this.getCurrentUser();
+        if (!currentUser) {
+            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Vous devez être connecté pour réserver', life: 5000 });
+            return;
+        }
+        if (!this.selectedGroup) {
+            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Aucun groupe sélectionné', life: 5000 });
+            return;
+        }
+        if (this.isLocked(groupId)) {
+            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Les réservations sont verrouillées après 18h le jour du raid', life: 5000 });
+            return;
+        }
+
+        const raid = this.raids.find(r => r.groupId === groupId);
+        const boss = raid?.bosses?.find(b => b.name === bossName);
+        const loot = boss?.loots?.find(l => l.itemId === itemId);  // Changed to l.itemId
+
+        if (!loot) {
+            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Item non trouvé', life: 5000 });
+            return;
+        }
+
+        this.raidService.reserveLootInGroup(groupId, bossName, itemId, currentUser, true).subscribe({  // Pass itemId
+            next: () => {
+                loot.softReservedBy.push(currentUser);
+                this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Item réservé', life: 5000 });
+                this.groupRaidsByGroupId();
+                this.cdr.detectChanges();
+            },
+            error: (err: any) => {
+                console.error('Erreur lors de la réservation :', JSON.stringify(err, null, 2));
+                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: err.error?.message || 'Impossible de réserver l\'item', life: 5000 });
+            }
+        });
+    }
+
+    public cancelReservation(groupId: number, bossName: string, itemId: string) {
+        const currentUser = this.getCurrentUser();
+        if (!currentUser) {
+            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Utilisateur non connecté', life: 5000 });
+            return;
+        }
+        if (!this.selectedGroup) {
+            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Aucun groupe sélectionné', life: 5000 });
+            return;
+        }
+        if (this.isLocked(groupId)) {
+            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Les réservations sont verrouillées après 18h le jour du raid', life: 5000 });
+            return;
+        }
+
+        const raid = this.raids.find(r => r.groupId === groupId);
+        const boss = raid?.bosses?.find(b => b.name === bossName);
+        const loot = boss?.loots?.find(l => l.itemId === itemId);  // Changed to l.itemId
+
+        if (!loot) {
+            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Item non trouvé', life: 5000 });
+            return;
+        }
+
+        this.raidService.reserveLootInGroup(groupId, bossName, itemId, currentUser, false).subscribe({  // Pass itemId
+            next: () => {
+                loot.softReservedBy = loot.softReservedBy.filter(u => u !== currentUser);
+                this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Réservation annulée', life: 5000 });
+                this.groupRaidsByGroupId();
+                this.cdr.detectChanges();
+            },
+            error: (err: any) => {
+                console.error('Erreur lors de l’annulation de la réservation :', JSON.stringify(err, null, 2));
+                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: err.error?.message || 'Échec de la suppression de la réservation', life: 5000 });
+            }
+        });
     }
 
     protected readonly Array = Array;

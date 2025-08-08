@@ -19,7 +19,6 @@ export class UserService {
     getCurrentUser(): Observable<User> {
         const token = localStorage.getItem('token');
         const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
-        console.log('Appel de getCurrentUser avec headers :', headers?.get('Authorization') || 'Aucun token');
         return this.http.get<User>(`${this.apiUrl}/me`, { headers });
     }
 }

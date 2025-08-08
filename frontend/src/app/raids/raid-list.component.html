@@ -140,13 +140,25 @@
                             </ng-template>
                         </td>
                         <td>
-                            <button class="reserve-button" (click)="addReservation(selectedBoss.name, loot.itemId)"
-                                    *ngIf="!loot.softReservedBy.includes(getCurrentUser())">
-                                Reserve
+                            <button *ngIf="!loot.softReservedBy.includes(getCurrentUser())"
+                                    pButton
+                                    type="button"
+                                    label="Reserve"
+                                    class="p-button-raised p-button-rounded p-button-sm"
+                                    (click)="reserveLoot(selectedGroup.groupId, selectedBoss.name, loot.itemId)"
+                                    [disabled]="isLocked(selectedGroup.groupId) || !selectedGroup"
+                                    [pTooltip]="isLocked(selectedGroup.groupId) ? 'Réservations verrouillées depuis le ' + (getLockDate(selectedGroup.groupId) || '') + ' à 18h' : 'Réservations verrouillées après le ' + (getLockDate(selectedGroup.groupId) || '') + ' à 18h'"
+                                    tooltipPosition="top">
                             </button>
-                            <button class="reserve-button cancel-button" (click)="removeReservation(selectedBoss.name, loot.itemId)"
-                                    *ngIf="loot.softReservedBy.includes(getCurrentUser())">
-                                Annuler
+                            <button *ngIf="loot.softReservedBy.includes(getCurrentUser())"
+                                    pButton
+                                    type="button"
+                                    label="Annuler"
+                                    class="p-button-raised p-button-rounded p-button-sm"
+                                    (click)="cancelReservation(selectedGroup.groupId, selectedBoss.name, loot.itemId)"
+                                    [disabled]="isLocked(selectedGroup.groupId) || !selectedGroup"
+                                    [pTooltip]="isLocked(selectedGroup.groupId) ? 'Réservations verrouillées depuis le ' + (getLockDate(selectedGroup.groupId) || '') + ' à 18h' : 'Réservations verrouillées après le ' + (getLockDate(selectedGroup.groupId) || '') + ' à 18h'"
+                                    tooltipPosition="top">
                             </button>
                         </td>
                     </tr>
