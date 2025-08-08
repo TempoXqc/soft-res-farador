@@ -228,3 +228,61 @@ export const updateGroupReservation = async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Erreur lors de la mise à jour de la réservation de groupe', error });
     }
 };
+
+export const updateDropInGroup = async (req: Request, res: Response) => {
+    const token = req.headers.authorization?.split('Bearer ')[1];
+    if (!token) {
+        console.log('❌ Aucun token fourni');
+        return res.status(401).json({ message: 'Aucun token fourni' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as CustomJwtPayload;
+        console.log('🔐 Token décodé :', decoded);
+        if (decoded.role !== 'admin') {
+            console.log('❌ Utilisateur non autorisé :', { decodedUsername: decoded.username });
+            return res.status(403).json({ message: 'Accès réservé aux administrateurs' });
+        }
+
+        const { groupId } = req.params;
+        const { bossName, itemId, droppedTo } = req.body;
+        console.log('Paramètres reçus pour updateDropInGroup :', { groupId, bossName, itemId, droppedTo });
+
+        const raids = await RaidModel.find({ groupId });
+        console.log('Raids trouvés :', raids);
+
+        if (!raids.length) {
+            console.log('❌ Aucun raid trouvé pour le groupe :', groupId);
+            return res.status(404).json({ message: 'Aucun raid trouvé pour ce groupe' });
+        }
+
+        let updated = false;
+        for (const raid of raids) {
+            const boss = raid.bosses.find(b => b.name === bossName);
+            console.log('Boss trouvé :', boss);
+            if (!boss) continue;
+
+            const loot = boss.loots.find(l => l.itemId === itemId);
+            console.log('Loot trouvé :', loot);
+            if (!loot) continue;
+
+            loot.droppedTo = Array.isArray(droppedTo) ? droppedTo : [];
+            updated = true;
+            await raid.save();
+            console.log('✅ Raid mis à jour dans le groupe pour droppedTo :', raid._id);
+
+            const io = (req as any).io as Server;
+            io.emit('raidUpdated', raid);
+        }
+
+        if (!updated) {
+            console.log('❌ Aucun loot ou boss correspondant trouvé pour :', { bossName, itemId });
+            return res.status(404).json({ message: 'Loot ou boss non trouvé' });
+        }
+
+        res.json({ message: 'Drop mis à jour pour le groupe avec succès' });
+    } catch (error) {
+        console.error('❌ Erreur lors de la mise à jour du drop :', error);
+        res.status(500).json({ message: 'Erreur lors de la mise à jour du drop', error });
+    }
+};

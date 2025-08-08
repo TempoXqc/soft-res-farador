@@ -19,6 +19,7 @@ import {Button} from "primeng/button";
 import {DialogModule} from "primeng/dialog";
 import {CalendarModule} from "primeng/calendar";
 import {FormGroup } from '@angular/forms';
+import {MultiSelectModule} from "primeng/multiselect";
 
 const MANAFORGE_OMEGA_BOSSES = [
     {
@@ -85,7 +86,6 @@ const MANAFORGE_OMEGA_BOSSES = [
             { id: "araz_012", itemId: "237570", itemName: "Logic Gate: Omega", slot: "Ring", softReservedBy: [], classAllowed: [], iconUrl: "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_ring03_etherealtechnomancerstyle_terra.jpg" },
             { id: "araz_013", itemId: "237726", itemName: "Marvel of Technomancy", slot: "Staff", softReservedBy: [], classAllowed: [], iconUrl: "https://wow.zamimg.com/images/wow/icons/large/inv_staff_2h_etherealraid_d_01.jpg" },
             { id: "araz_014", itemId: "242402", itemName: "Araz's Ritual Forge", slot: "Trinket", softReservedBy: [], classAllowed: [], iconUrl: "https://wow.zamimg.com/images/wow/icons/large/inv_112_raidtrinkets_trinkettechnomancer_ritualengine.jpg" },
-            { id: "araz_015", itemId: "235499", itemName: "Reshii Wraps", slot: "Cloak", softReservedBy: [], classAllowed: [], iconUrl: "https://wow.zamimg.com/images/wow/icons/large/inv_cape_armor_etherealshawl_d_01.jpg" }
         ]
     },
     {
@@ -181,13 +181,14 @@ const MANAFORGE_OMEGA_BOSSES = [
 @Component({
     selector: 'app-raid-list',
     standalone: true,
-    imports: [CommonModule, FormsModule, TooltipModule, TableModule, DropdownModule, ToastModule, LoginModalComponent, Button, DialogModule, CalendarModule, ReactiveFormsModule],
+    imports: [CommonModule, FormsModule, TooltipModule, TableModule, DropdownModule, ToastModule, LoginModalComponent, Button, DialogModule, CalendarModule, ReactiveFormsModule, MultiSelectModule],
     templateUrl: './raid-list.component.html',
     styleUrls: ['./raid-list.component.scss']
 })
 export class RaidListComponent implements OnInit, OnDestroy {
     raids: Raid[] = [];
     users: User[] = [];
+    userOptions: any[] = [];
     isLoggedIn: boolean = false;
     username: string | null = null;
     selectedBoss: any = null;
@@ -198,7 +199,6 @@ export class RaidListComponent implements OnInit, OnDestroy {
     @ViewChild('lootList') lootList!: ElementRef;
     @Output() raidCreated = new EventEmitter<void>();
     private socket: Socket;
-
     newRaid: any = {
         name: 'Manaforge Omega',
         difficulty: 'Normal',
@@ -241,6 +241,9 @@ export class RaidListComponent implements OnInit, OnDestroy {
                 this.cdr.detectChanges();
             }
         });
+        this.authService.loginModalState$.subscribe(state => {
+            this.showLoginModal = state;
+        });
         this.setupSocketListeners();
     }
 
@@ -261,8 +264,9 @@ export class RaidListComponent implements OnInit, OnDestroy {
                 this.groupRaidsByGroupId();
                 this.cdr.detectChanges();
             },
-            error: (err: any) => {
-                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Échec du chargement des raids', life: 5000 });
+            error: (err) => {
+                console.error('Erreur lors du chargement des raids :', JSON.stringify(err, null, 2));
+                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de charger les raids' });
             }
         });
     }
@@ -284,15 +288,18 @@ export class RaidListComponent implements OnInit, OnDestroy {
     }
 
     loadUsers() {
-        console.log('Chargement des utilisateurs...');
         this.userService.getUsers().subscribe({
-            next: (users: User[]) => {
+            next: (users) => {
+                console.log('Utilisateurs chargés :', users);
                 this.users = users;
+                this.userOptions = users.map(user => ({
+                    label: user.username,
+                    value: user.username
+                }));
+                console.log('userOptions :', this.userOptions);
             },
-            error: (err: any) => {
+            error: (err) => {
                 console.error('Erreur lors du chargement des utilisateurs :', err);
-                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Échec du chargement des utilisateurs', life: 5000 });
-                this.users = [];
             }
         });
     }
@@ -329,11 +336,6 @@ export class RaidListComponent implements OnInit, OnDestroy {
     closeGroupDetails() {
         this.selectedGroup = null;
         this.selectedBoss = null;
-    }
-
-    selectBoss(boss: any) {
-        this.selectedBoss = boss;
-        this.scrollToTop();
     }
 
     addReservation(bossName: string, lootId: string) {
@@ -384,27 +386,6 @@ export class RaidListComponent implements OnInit, OnDestroy {
         });
     }
 
-    updateDrop(bossName: string, lootId: string, selectedUser: string | null | undefined) {
-        console.log('updateDrop appelé avec selectedUser :', selectedUser);
-        if (!selectedUser && selectedUser !== null) {
-            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Aucun utilisateur sélectionné pour le drop', life: 5000 });
-            return;
-        }
-        if (!this.selectedGroup || !this.selectedGroup.raids[0]._id) {
-            this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'ID du raid manquant ou groupe non sélectionné', life: 5000 });
-            return;
-        }
-        this.raidService.updateDrop(this.selectedGroup.raids[0]._id, bossName, lootId, selectedUser).subscribe({
-            next: () => {
-                this.messageService.add({ severity: 'success', summary: 'Drop mis à jour', detail: 'Drop assigné', life: 5000 });
-            },
-            error: (err: any) => {
-                console.error('Erreur lors de la mise à jour du drop :', err);
-                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Échec update drop', life: 5000 });
-            }
-        });
-    }
-
     autoReserveForNewGroup(previousGroups: { groupId: number; raids: Raid[] }[], newGroupId: number) {
         const latestGroup = previousGroups[0];
         if (!latestGroup) return;
@@ -441,6 +422,26 @@ export class RaidListComponent implements OnInit, OnDestroy {
             }
         }
         return false;
+    }
+
+    selectBoss(boss: any) {
+        this.selectedBoss = boss;
+        this.cdr.detectChanges();
+        setTimeout(() => this.scrollToTop(), 0); // Scroll après rendu
+    }
+
+    updateDrop(groupId: number, bossName: string, itemId: string, droppedTo: string[]) {
+        console.log('Appel de updateDrop avec :', { groupId, bossName, itemId, droppedTo });
+        this.raidService.updateDrop(groupId, bossName, itemId, droppedTo).subscribe({
+            next: () => {
+                this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Drop mis à jour avec succès' });
+                this.loadRaids();
+            },
+            error: (err) => {
+                console.error('Erreur lors de la mise à jour du drop :', JSON.stringify(err, null, 2));
+                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de mettre à jour le drop : ' + (err.statusText || err.message) });
+            }
+        });
     }
 
     openLoginModal() {
@@ -548,4 +549,6 @@ export class RaidListComponent implements OnInit, OnDestroy {
         }
         this.showLoginModal = false;
     }
+
+    protected readonly Array = Array;
 }

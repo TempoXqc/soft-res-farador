@@ -7,7 +7,8 @@ const LootSchema = new mongoose.Schema({
     itemId: String,
     id: String,
     classAllowed: [String],
-    iconUrl: String
+    iconUrl: String,
+    droppedTo: [String]
 }, { _id: false });
 
 const BossSchema = new mongoose.Schema({

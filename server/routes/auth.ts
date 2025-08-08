@@ -1,59 +1,46 @@
-// auth.service.ts
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import express, { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import User from '../models/User';
 
-@Injectable({
-    providedIn: 'root'
-})
-export class AuthService {
-    private currentUser: string | null = null;
-    private token: string | null = null;
+const router = express.Router();
 
-    constructor(private http: HttpClient) {
-        // Vérifie si un token existe dans localStorage au démarrage
-        this.token = localStorage.getItem('token');
-        if (this.token) {
-            try {
-                const decoded = this.decodeToken(this.token);
-                this.currentUser = decoded.username;
-            } catch (error) {
-                console.error('Erreur lors du décodage du token au démarrage :', error);
-                this.logout();
-            }
-        }
+router.post('/login', async (req: Request, res: Response) => {
+    const { username, password } = req.body;
+
+    console.log('Tentative de connexion avec :', { username, password });
+
+    if (!username || !password) {
+        console.log('❌ Username ou password manquant');
+        return res.status(400).json({ message: 'Username et password sont requis' });
     }
 
-    login(username: string, password: string): Observable<any> {
-        return this.http.post('/api/auth/login', { username, password }).pipe(
-            tap((response: any) => {
-                this.token = response.token;
-                this.currentUser = username;
-                localStorage.setItem('token', this.token);
-            })
+    try {
+        const user = await User.findOne({ username });
+        if (!user) {
+            console.log('❌ Utilisateur non trouvé :', username);
+            return res.status(401).json({ message: 'Utilisateur ou mot de passe incorrect' });
+        }
+
+        console.log('Utilisateur trouvé :', user);
+
+        // Comparaison directe du mot de passe en texte clair
+        if (password !== user.password) {
+            console.log('❌ Mot de passe incorrect pour :', username);
+            return res.status(401).json({ message: 'Utilisateur ou mot de passe incorrect' });
+        }
+
+        const token = jwt.sign(
+            { username: user.username, role: user.role, class: user.class, armoryUrl: user.armoryUrl },
+            process.env.JWT_SECRET!,
+            { expiresIn: '1h' }
         );
-    }
 
-    getCurrentUser(): string | null {
-        return this.currentUser;
+        console.log('✅ Connexion réussie pour :', username);
+        res.json({ token });
+    } catch (error) {
+        console.error('❌ Erreur lors de la connexion :', error);
+        res.status(500).json({ message: 'Erreur lors de la connexion', error });
     }
+});
 
-    getToken(): string | null {
-        return this.token || localStorage.getItem('token');
-    }
-
-    logout() {
-        this.currentUser = null;
-        this.token = null;
-        localStorage.removeItem('token');
-    }
-
-    private decodeToken(token: string): any {
-        try {
-            return JSON.parse(atob(token.split('.')[1]));
-        } catch (error) {
-            throw new Error('Token invalide');
-        }
-    }
-}
+export default router; // Export par défaut requis

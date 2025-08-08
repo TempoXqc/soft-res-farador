@@ -98,20 +98,41 @@
                                     </span>
                             </ng-container>
                             <ng-template #noReservation>
-                                <span class="player-tag">None</span>
+                                <span class="player-tag"></span>
                             </ng-template>
                         </td>
-                        <td class="loot-slot"></td>
                         <td>
-                            <button class="reserve-button" (click)="addReservation(selectedBoss.name, loot.itemId)"
-                                    *ngIf="!loot.softReservedBy.includes(getCurrentUser())">
-                                Reserve
-                            </button>
-                            <button class="reserve-button" (click)="removeReservation(selectedBoss.name, loot.itemId)"
-                                    *ngIf="loot.softReservedBy.includes(getCurrentUser())">
-                                Annuler
-                            </button>
+                            <ng-container *ngIf="isAdmin(); else dropText">
+                                <p-multiSelect
+                                        [options]="userOptions"
+                                        [(ngModel)]="loot.droppedTo"
+                                        (onChange)="updateDrop(selectedGroup.groupId, selectedBoss.name, loot.itemId, $event.value)"
+                                        placeholder="Sélectionner des utilisateurs"
+                                        [showClear]="true"
+                                        optionLabel="label"
+                                        styleClass="multiselect-custom">
+                                    <ng-template let-user pTemplate="item">
+                                        {{ user.label }}
+                                    </ng-template>
+                                </p-multiSelect>
+                            </ng-container>
+                            <ng-template #dropText>
+                                <ng-container *ngIf="Array.isArray(loot.droppedTo) && loot.droppedTo.length">
+                                    {{ loot.droppedTo.join(', ') }}
+                                </ng-container>
+                                <ng-container *ngIf="!Array.isArray(loot.droppedTo) || !loot.droppedTo.length">
+                                    {{ loot.droppedTo || 'None' }}
+                                </ng-container>
+                            </ng-template>
                         </td>
+                        <button class="reserve-button" (click)="addReservation(selectedBoss.name, loot.itemId)"
+                                *ngIf="!loot.softReservedBy.includes(getCurrentUser())">
+                            Reserve
+                        </button>
+                        <button class="reserve-button cancel-button" (click)="removeReservation(selectedBoss.name, loot.itemId)"
+                                *ngIf="loot.softReservedBy.includes(getCurrentUser())">
+                            Annuler
+                        </button>
                     </tr>
                     </tbody>
                 </table>

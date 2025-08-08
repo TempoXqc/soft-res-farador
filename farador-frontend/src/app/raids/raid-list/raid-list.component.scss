@@ -278,3 +278,19 @@ button:disabled {
   position: relative;
   overflow: visible;
 }
+
+.cancel-button {
+  background-color: #f28c38;
+  color: white;
+  border: 1px solid #333;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cancel-button:hover {
+  background-color: #e07b30;
+}

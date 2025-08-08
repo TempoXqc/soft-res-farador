@@ -17,4 +17,5 @@ export interface Loot {
     itemName: string;
     slot: string;
     softReservedBy: string[];
+    droppedTo?: string[];
 }
