@@ -58,7 +58,6 @@ export class RaidService {
         );
     }
 
-    // Dans raid.service.ts
     getReservationHistory(groupId: number, bossName?: string, itemId?: string): Observable<History[]> {
         const token = localStorage.getItem('token');
         const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;

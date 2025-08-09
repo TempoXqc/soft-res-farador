@@ -304,7 +304,6 @@ export const updateReservedInGroup = async (req: Request, res: Response) => {
     }
 }
 
-// Dans raids.controller.ts
 export const getReservationHistory = async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split('Bearer ')[1];
     if (!token) {
@@ -318,33 +317,29 @@ export const getReservationHistory = async (req: Request, res: Response) => {
         }
 
         const { groupId } = req.params;
-        const { bossName, itemId } = req.query as { bossName?: string; itemId?: string }; // Typage explicite
+        const { bossName, itemId } = req.query as { bossName?: string; itemId?: string };
 
         const raids = await RaidModel.find({ groupId: parseInt(groupId) });
         if (!raids.length) {
             return res.status(404).json({ message: 'Aucun raid trouvé pour ce groupe' });
         }
 
-        // Trier les raids par date ascendante pour obtenir le premier (le plus ancien)
         raids.sort((a, b) => {
             const dateA = a.date ? new Date(a.date).getTime() : Number.MAX_SAFE_INTEGER;
             const dateB = b.date ? new Date(b.date).getTime() : Number.MAX_SAFE_INTEGER;
             return dateA - dateB;
         });
 
-        // Prendre l'historique du premier raid
         const history = (raids[0].history || []).map(entry => ({
             action: entry.action,
             username: entry.username,
             timestamp: entry.timestamp,
             bossName: entry.bossName,
             itemId: entry.itemId
-        })); // Convertir en tableau simple
+        }));
 
-        // Trier l'historique par timestamp décroissant (plus récent en premier)
         const sortedHistory = history.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-        // Si bossName et itemId sont fournis, filtrer sur l'historique trié
         if (typeof bossName === 'string' && typeof itemId === 'string') {
             return res.json(sortedHistory.filter(h => h.bossName === bossName && h.itemId === itemId));
         }
