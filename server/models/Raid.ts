@@ -17,12 +17,21 @@ const BossSchema = new mongoose.Schema({
     iconUrl: String
 }, { _id: false });
 
+const HistorySchema = new mongoose.Schema({
+    action: { type: String, enum: ['add', 'remove'] },
+    username: String,
+    timestamp: { type: Date, default: Date.now },
+    bossName: String,
+    itemId: String
+}, { _id: false });
+
 const RaidSchema = new mongoose.Schema({
     name: String,
     difficulty: String,
     date: Date,
     bosses: [BossSchema],
-    groupId: Number
+    groupId: Number,
+    history: [HistorySchema]
 });
 
 const RaidModel = mongoose.model('Raid', RaidSchema);

@@ -1,3 +1,11 @@
+export interface History {
+    action: 'add' | 'remove';
+    username: string;
+    timestamp: string;
+    bossName: string;
+    itemId: string;
+}
+
 export interface Raid {
     _id?: string;
     name: string;
@@ -5,6 +13,7 @@ export interface Raid {
     difficulty: 'Normal' | 'Heroic' | 'Mythic';
     groupId: number;
     bosses: Boss[];
+    history?: History[];
 }
 
 export interface Boss {

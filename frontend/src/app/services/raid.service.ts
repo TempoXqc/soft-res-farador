@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Raid } from '../models/raid';
+import { History, Raid } from '../models/raid';
 import {environment} from "../../environments/environment";
 
 @Injectable({
@@ -53,6 +53,25 @@ export class RaidService {
         return this.http.put(`${this.apiUrl}/group/${groupId}/reserved`, { bossName, itemId, softReservedBy }, { headers }).pipe(
             catchError((error) => {
                 console.error('Erreur lors de updateReserved :', JSON.stringify(error, null, 2));
+                throw error;
+            })
+        );
+    }
+
+    // Dans raid.service.ts
+    getReservationHistory(groupId: number, bossName?: string, itemId?: string): Observable<History[]> {
+        const token = localStorage.getItem('token');
+        const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
+        let params = new HttpParams();
+        if (bossName) {
+            params = params.set('bossName', bossName);
+        }
+        if (itemId) {
+            params = params.set('itemId', itemId);
+        }
+        return this.http.get<History[]>(`${this.apiUrl}/group/${groupId}/history`, { headers, params }).pipe(
+            catchError((error) => {
+                console.error('Erreur lors de getReservationHistory :', JSON.stringify(error, null, 2));
                 throw error;
             })
         );

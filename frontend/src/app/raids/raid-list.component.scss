@@ -83,8 +83,8 @@
 .modal-content {
   position: relative;
   display: flex;
-  width: 90%;
-  max-height: 80%;
+  width: 98%;
+  max-height: 85%;
   background-color: #0d0d0d;
   border: 1px solid #333;
   border-radius: 10px;
@@ -107,23 +107,37 @@
   z-index: 10;
 }
 
+.history-button {
+  position: absolute;
+  top: 10px;
+  left: 25px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 5px;
+  z-index: 10;
+}
+
 .boss-list {
   flex: 1;
   max-width: 15%;
   overflow-y: auto;
-  border-right: 2px solid #333;
+  height: 100%;
+  margin-top: 2.2rem;
 }
 
 .boss-item {
   display: flex;
   align-items: center;
+  margin: 8px 0 4px 0;
   padding: 8px;
   cursor: pointer;
   transition: background 0.3s ease;
   background-color: #1a1a1a;
   font-weight: bold;
   border-bottom: 2px solid #333;
-  margin-bottom: 4px;
   border-radius: 5px;
 }
 
@@ -148,7 +162,7 @@
 .loot-list {
   flex: 2;
   overflow-y: auto;
-  margin-top: 1.75rem;
+  margin: 2.75rem 0.75rem;
   max-height: calc(80vh - 6rem);
   background-color: #0d0d0d;
 }
@@ -168,7 +182,7 @@
   background-color: #1a1a1a;
   font-weight: bold;
   position: sticky;
-  top: 0;
+  top: -1px;
   z-index: 10;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   height: 24px;
@@ -244,7 +258,6 @@
 table {
   width: 100%;
   border-collapse: collapse;
-  margin: 20px 0;
 }
 
 th, td {
@@ -305,6 +318,7 @@ button:disabled {
 .locked-message {
   margin-bottom: 1rem;
 }
+
 .p-message-warn {
   background-color: #fff3e0;
   border-color: #fb923c;

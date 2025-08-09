@@ -9,7 +9,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { TableModule } from 'primeng/table';
 import { DropdownModule } from 'primeng/dropdown';
 import { UserService } from '../services/user.service';
-import { Raid } from '../models/raid';
+import { History, Loot, Raid} from '../models/raid';
 import { User } from '../models/user';
 import { ToastModule } from 'primeng/toast';
 import {LoginModalComponent} from "../auth/login-modal.component";
@@ -196,6 +196,8 @@ export class RaidListComponent implements OnInit, OnDestroy {
     showCreateRaidModal: boolean = false;
     raidGroups: { groupId: number; raids: Raid[]; bosses: any[] }[] = [];
     selectedGroup: { groupId: number; raids: Raid[]; bosses: any[] } | null = null;
+    historyDialogVisible: boolean = false;
+    public selectedHistory: History[] = [];
     @ViewChild('lootList') lootList!: ElementRef;
     @Output() raidCreated = new EventEmitter<void>();
     private socket: Socket;
@@ -654,6 +656,36 @@ export class RaidListComponent implements OnInit, OnDestroy {
             error: (err: any) => {
                 console.error('Erreur lors de l’annulation de la réservation :', JSON.stringify(err, null, 2));
                 this.messageService.add({ severity: 'error', summary: 'Erreur', detail: err.error?.message || 'Échec de la suppression de la réservation', life: 5000 });
+            }
+        });
+    }
+
+
+    public getItemName(bossName: string, itemId: string): string {
+        if (!this.selectedGroup) return 'Item inconnu';
+        const boss = this.selectedGroup.bosses.find(b => b.name === bossName);
+        if (!boss) return 'Item inconnu';
+        const loot = boss.loots.find((l: Loot) => l.itemId === itemId);
+        return loot ? loot.itemName : 'Item inconnu';
+    }
+
+    public openHistory(groupId: number) {
+        this.fetchHistory(groupId);
+        this.historyDialogVisible = true;
+    }
+
+    public fetchHistory(groupId: number, bossName?: string, itemId?: string) {
+        this.raidService.getReservationHistory(groupId, bossName, itemId).subscribe({
+            next: (history: History[]) => {
+                this.selectedHistory = history.sort((a, b) => {
+                    const dateA = new Date(a.timestamp);
+                    const dateB = new Date(b.timestamp);
+                    return dateB.getTime() - dateA.getTime();
+                });
+            },
+            error: (err) => {
+                console.error('Erreur lors de la récupération de l\'historique :', err);
+                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de charger l\'historique', life: 5000 });
             }
         });
     }

@@ -23,7 +23,7 @@
             </tr>
             </tbody>
         </table>
-        <div *ngIf="isAdmin()" style="margin-bottom: 20px;">
+        <div *ngIf="isAdmin()" style="margin-top: 20px;">
             <p-button label="Créer un raid" (onClick)="openCreateRaidModal()"></p-button>
         </div>
 
@@ -58,8 +58,14 @@
     <div class="modal-overlay" *ngIf="selectedGroup">
         <div class="modal-content">
             <button class="close-icon" (click)="closeGroupDetails()">✕</button>
+            <p-button *ngIf="isAdmin() && selectedGroup?.groupId !== undefined && selectedGroup?.groupId !== null"
+                      label="Historique"
+                      icon="pi pi-history"
+                      class="p-button-text history-button"
+                      pTooltip="Historique"
+                      (click)="openHistory(selectedGroup.groupId)">
+            </p-button>
             <div class="boss-list">
-                <h3>Bosses</h3>
                 <div *ngIf="selectedGroup.bosses && selectedGroup.bosses.length > 0; else noBosses">
                     <div class="boss-item" [class.selected]="boss === selectedBoss" *ngFor="let boss of selectedGroup.bosses" (click)="selectBoss(boss)">
                         <img *ngIf="boss.iconUrl" class="boss-icon" [src]="boss.iconUrl" alt="{{ boss.name }}" />
@@ -167,6 +173,25 @@
             </div>
         </div>
     </div>
+
+    <p-dialog header="Historique des réservations" [(visible)]="historyDialogVisible" [modal]="true" [style]="{width: '50vw'}">
+        <table class="history-table">
+            <tbody>
+            <tr *ngFor="let entry of selectedHistory">
+                <td>
+                    {{ entry.timestamp | date:'dd MMMM yyyy à HH:mm' }}
+                    {{ entry.username }}
+                    {{ entry.action === 'add' ? 'a réservé l\'item' : 'n\'a plus réservé l\'item' }}
+                    {{ getItemName(entry.bossName, entry.itemId) }}
+                    sur le boss {{ entry.bossName }}
+                </td>
+            </tr>
+            <tr *ngIf="selectedHistory.length === 0">
+                <td>Aucun historique disponible.</td>
+            </tr>
+            </tbody>
+        </table>
+    </p-dialog>
 </div>
 
 <ng-template #notLoggedIn>
