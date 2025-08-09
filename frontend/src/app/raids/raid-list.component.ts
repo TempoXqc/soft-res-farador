@@ -601,14 +601,14 @@ export class RaidListComponent implements OnInit, OnDestroy {
 
         const raid = this.raids.find(r => r.groupId === groupId);
         const boss = raid?.bosses?.find(b => b.name === bossName);
-        const loot = boss?.loots?.find(l => l.itemId === itemId);  // Changed to l.itemId
+        const loot = boss?.loots?.find(l => l.itemId === itemId);
 
         if (!loot) {
             this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Item non trouvé', life: 5000 });
             return;
         }
 
-        this.raidService.reserveLootInGroup(groupId, bossName, itemId, currentUser, true).subscribe({  // Pass itemId
+        this.raidService.reserveLootInGroup(groupId, bossName, itemId, currentUser, true).subscribe({
             next: () => {
                 loot.softReservedBy.push(currentUser);
                 this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Item réservé', life: 5000 });
@@ -639,14 +639,14 @@ export class RaidListComponent implements OnInit, OnDestroy {
 
         const raid = this.raids.find(r => r.groupId === groupId);
         const boss = raid?.bosses?.find(b => b.name === bossName);
-        const loot = boss?.loots?.find(l => l.itemId === itemId);  // Changed to l.itemId
+        const loot = boss?.loots?.find(l => l.itemId === itemId);
 
         if (!loot) {
             this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Item non trouvé', life: 5000 });
             return;
         }
 
-        this.raidService.reserveLootInGroup(groupId, bossName, itemId, currentUser, false).subscribe({  // Pass itemId
+        this.raidService.reserveLootInGroup(groupId, bossName, itemId, currentUser, false).subscribe({
             next: () => {
                 loot.softReservedBy = loot.softReservedBy.filter(u => u !== currentUser);
                 this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Réservation annulée', life: 5000 });

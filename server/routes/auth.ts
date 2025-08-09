@@ -30,9 +30,7 @@ router.post('/login', async (req: Request, res: Response) => {
                 url_bis: user.url_bis,
                 url_io: user.url_io
             },
-            process.env.JWT_SECRET!,
-            { expiresIn: '1h' }
-        );
+            process.env.JWT_SECRET!);
 
         res.json({ token });
     } catch (error) {
