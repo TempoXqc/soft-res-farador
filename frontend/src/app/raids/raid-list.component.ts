@@ -20,6 +20,7 @@ import {CalendarModule} from "primeng/calendar";
 import {MultiSelectModule} from "primeng/multiselect";
 import {environment} from "../../environments/environment";
 import {jwtDecode} from "jwt-decode";
+import {forkJoin, map} from "rxjs";
 
 const MANAFORGE_OMEGA_BOSSES = [
     {
@@ -189,6 +190,7 @@ export class RaidListComponent implements OnInit, OnDestroy {
     raids: Raid[] = [];
     users: User[] = [];
     userOptions: any[] = [];
+    userClasses: { [username: string]: string } = {};
     isLoggedIn: boolean = false;
     username: string | null = null;
     selectedBoss: any = null;
@@ -227,6 +229,24 @@ export class RaidListComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+
+        forkJoin([
+            this.raidService.getRaids(),  // Ou votre méthode pour charger les raids
+            this.userService.getUsers()
+        ]).subscribe({
+            next: ([raids, users]) => {
+                this.userClasses = users.reduce((acc, user) => {
+                    acc[user.username] = user.class;
+                    return acc;
+                }, {} as { [key: string]: string });
+                this.cdr.detectChanges();  // Rafraîchit après chargement complet
+            },
+            error: (err) => {
+                console.error('Erreur chargement initial :', err);
+            }
+        });
+
+
         this.authService.isLoggedIn.subscribe(isLoggedIn => {
             this.isLoggedIn = isLoggedIn;
             this.username = this.authService.getCurrentUser();
@@ -263,11 +283,28 @@ export class RaidListComponent implements OnInit, OnDestroy {
             next: (raids) => {
                 this.raids = raids.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
                 this.groupRaidsByGroupId();
+                this.loadUserClasses();
                 this.cdr.detectChanges();
             },
             error: (err) => {
                 console.error('Erreur lors du chargement des raids :', JSON.stringify(err, null, 2));
                 this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de charger les raids' });
+            }
+        });
+    }
+
+    loadUserClasses() {
+        this.userService.getUsers().subscribe({
+            next: (users: User[]) => {
+                this.userClasses = users.reduce((acc, user) => {
+                    acc[user.username] = user.class;
+                    return acc;
+                }, {} as { [key: string]: string });
+                this.cdr.detectChanges();  // Ou this.cdr.markForCheck(); pour rafraîchir le template
+            },
+            error: (err) => {
+                console.error('Erreur lors du chargement des classes :', err);
+                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de charger les classes des utilisateurs', life: 5000 });
             }
         });
     }
@@ -613,6 +650,7 @@ export class RaidListComponent implements OnInit, OnDestroy {
                 loot.softReservedBy.push(currentUser);
                 this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Item réservé', life: 5000 });
                 this.groupRaidsByGroupId();
+                this.loadUserClasses();
                 this.cdr.detectChanges();
             },
             error: (err: any) => {
@@ -651,6 +689,7 @@ export class RaidListComponent implements OnInit, OnDestroy {
                 loot.softReservedBy = loot.softReservedBy.filter(u => u !== currentUser);
                 this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Réservation annulée', life: 5000 });
                 this.groupRaidsByGroupId();
+                this.loadUserClasses();
                 this.cdr.detectChanges();
             },
             error: (err: any) => {
@@ -659,7 +698,6 @@ export class RaidListComponent implements OnInit, OnDestroy {
             }
         });
     }
-
 
     public getItemName(bossName: string, itemId: string): string {
         if (!this.selectedGroup) return 'Item inconnu';
@@ -688,6 +726,10 @@ export class RaidListComponent implements OnInit, OnDestroy {
                 this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de charger l\'historique', life: 5000 });
             }
         });
+    }
+
+    public getUserClass(username: string): string {
+        return this.userClasses[username] || 'Classe inconnue';
     }
 
     protected readonly Array = Array;

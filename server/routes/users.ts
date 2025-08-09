@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get('/', async (req: Request, res: Response) => {
     try {
-        const users = await User.find({}, { username: 1, _id: 0 });
+        const users = await User.find({}, { username: 1, class: 1, _id: 0 });
         res.json(users);
     } catch (error) {
         console.error('❌ Erreur lors du chargement des utilisateurs :', error);
@@ -35,6 +35,19 @@ router.get('/me', async (req: Request, res: Response) => {
         }
         console.error('❌ Erreur lors de la récupération de l\'utilisateur :', error);
         res.status(500).json({ message: 'Erreur lors de la récupération de l\'utilisateur', error });
+    }
+});
+
+router.get('/:username', async (req: Request, res: Response) => {
+    try {
+        const user = await User.findOne({ username: req.params.username }, { username: 1, class: 1, _id: 0 });
+        if (!user) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé' });
+        }
+        res.json(user);
+    } catch (error) {
+        console.error('❌ Erreur lors de la récupération de l\'utilisateur :', error);
+        res.status(500).json({ message: 'Erreur serveur', error });
     }
 });
 

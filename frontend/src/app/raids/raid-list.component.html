@@ -113,7 +113,7 @@
                         <ng-template #nonAdminReserved>
                             <td>
                                 <ng-container *ngFor="let player of loot.softReservedBy; let isLast = last">
-                                    <span class="player-tag" [ngClass]="{'current-user': player === username}">
+                                    <span  pTooltip="{{ getUserClass(player) }}" tooltipPosition="top" class="player-tag" [ngClass]="{'current-user': player === username}">
                                         {{ player }}{{ isLast ? '' : ', ' }}
                                     </span>
                                 </ng-container>
