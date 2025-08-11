@@ -13,12 +13,15 @@
             <tr>
                 <td>Réservation {{ group.groupId }}</td>
                 <td>
-                    <div *ngFor="let raid of group.raids">
-                        {{ raid.name }} ({{ raid.difficulty }}) - {{ raid.date | date:'medium' }}
+                    <div class="raid-group">
+                        <div *ngFor="let raid of group.raids">
+                            {{ raid.name }} ({{ raid.difficulty }}) - {{ raid.date | date:'medium' }}
+                        </div>
                     </div>
                 </td>
-                <td class="logs-icon">
+                <td>
                     <button class="icon-button" (click)="openGroupDetails(group)" pTooltip="Voir les détails">➤</button>
+                    <span *ngIf="isAdmin()" class="info-icon" pTooltip="Joueurs sans réservation : {{ nonReservedUsers[group.groupId]?.length ? nonReservedUsers[group.groupId].join(', ') : 'Aucun' }}" tooltipPosition="top">ℹ</span>
                 </td>
             </tr>
             </tbody>

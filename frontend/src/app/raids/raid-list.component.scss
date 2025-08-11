@@ -361,3 +361,17 @@ button:disabled {
   scrollbar-width: thin;
   scrollbar-color: #444 #1a1a1a;
 }
+
+.info-icon {
+  margin-left: 10px;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #fff;
+  align-items: center;
+  justify-content: center;
+  display: inline-block;
+}
+
+.info-icon:hover {
+  color: #0056b3;
+}
