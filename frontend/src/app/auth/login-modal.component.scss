@@ -20,8 +20,13 @@ label {
 input {
   width: 100%;
   padding: 0.7rem;
-  color: #ccc;
+  color: #000;
   border-radius: 8px;
+  border: 1px solid #444;
+}
+
+input.error-border {
+  border: 2px solid #ff4d4f;
 }
 
 .p-button {
@@ -30,12 +35,33 @@ input {
   border: none;
   padding: 8px 16px;
   border-radius: 8px;
-  align-items: center;
   display: flex;
-  text-align: center;
+  align-items: center;
   justify-content: center;
 }
 
-.p-button:hover {
+.p-button:hover:not(:disabled) {
   background-color: #0056b3;
+}
+
+.p-button:disabled {
+  background-color: #4a4a4a;
+  cursor: not-allowed;
+}
+
+.p-error {
+  color: #ff4d4f;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  display: block;
+}
+
+.custom-spinner {
+  width: 30px;
+  height: 30px;
+  margin: 0 auto 1rem;
+}
+
+.p-text-center {
+  text-align: center;
 }

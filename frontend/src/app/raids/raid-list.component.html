@@ -30,7 +30,7 @@
             <p-button label="Créer un raid" (onClick)="openCreateRaidModal()"></p-button>
         </div>
 
-        <p-dialog header="Créer un nouveau raid" [(visible)]="showCreateRaidModal" [modal]="true" (onHide)="closeCreateRaidModal()">
+        <p-dialog header="Créer un nouveau raid" [(visible)]="showCreateRaidModal" [modal]="true" (onHide)="closeCreateRaidModal()"  closable="true" [dismissableMask]="true">
             <div style="margin-top: 10px;">
                 <label for="raidDifficulty">Difficulté : </label>
                 <p-dropdown id="raidDifficulty" [(ngModel)]="newRaid.difficulty" [options]="difficulties" placeholder="Sélectionner la difficulté"></p-dropdown>
@@ -177,7 +177,7 @@
         </div>
     </div>
 
-    <p-dialog header="Historique des réservations" [(visible)]="historyDialogVisible" [modal]="true" [style]="{width: '50vw'}">
+    <p-dialog header="Historique des réservations" [(visible)]="historyDialogVisible" [modal]="true" [style]="{'max-height': '500px', 'width': '50vw'}" closable="true" [dismissableMask]="true">
         <table class="history-table">
             <tbody>
             <tr *ngFor="let entry of selectedHistory">

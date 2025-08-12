@@ -14,11 +14,11 @@ router.post('/login', async (req: Request, res: Response) => {
     try {
         const user = await User.findOne({ username });
         if (!user) {
-            return res.status(401).json({ message: 'Utilisateur ou mot de passe incorrect' });
+            return res.status(401).json({ error: { code: 'invalidUsername', message: 'Utilisateur incorrect' } });
         }
 
         if (password !== user.password) {
-            return res.status(401).json({ message: 'Utilisateur ou mot de passe incorrect' });
+            return res.status(401).json({ error: { code: 'invalidPassword', message: 'Mot de passe incorrect' } });
         }
 
         const token = jwt.sign(
