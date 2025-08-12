@@ -375,3 +375,21 @@ button:disabled {
 .info-icon:hover {
   color: #0056b3;
 }
+
+.reservation-message {
+  text-align: center;
+  color: #e0e0e0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: flex;
+  justify-content: center;
+  transform: translate(-50%);
+  align-items: center;
+
+  h3 {
+    margin-left: 20px;
+  }
+}

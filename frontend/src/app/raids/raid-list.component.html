@@ -68,6 +68,10 @@
                       pTooltip="Historique"
                       (click)="openHistory(selectedGroup.groupId)">
             </p-button>
+            <div class="reservation-message">
+                <i [ngClass]="getReservationIconClass()"></i>
+                <h3>{{ getReservationMessage() }}</h3>
+            </div>
             <div class="boss-list">
                 <div *ngIf="selectedGroup.bosses && selectedGroup.bosses.length > 0; else noBosses">
                     <div class="boss-item" [class.selected]="boss === selectedBoss" *ngFor="let boss of selectedGroup.bosses" (click)="selectBoss(boss)">

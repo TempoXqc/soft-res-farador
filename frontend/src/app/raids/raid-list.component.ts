@@ -722,13 +722,68 @@ export class RaidListComponent implements OnInit, OnDestroy {
 
         });
 
-        // Handle case where no raids exist for a group
         if (!this.raidGroups.some(group => group.groupId === 1)) {
             console.warn('No raids for group 1, setting nonReservedUsers[1] to empty');
             this.nonReservedUsers[1] = [];
         }
 
         this.cdr.detectChanges();
+    }
+
+    getReservationMessage(): string {
+        const currentUser = this.getCurrentUser();
+
+        if (!currentUser || !this.selectedGroup || !this.selectedGroup.groupId) {
+            return 'Sélectionnez vos deux loots';
+        }
+
+        let reservedCount = 0;
+        const raids = this.raidGroups.find(group => group.groupId === this.selectedGroup!.groupId)?.raids || [];
+        raids.forEach(raid => {
+            raid.bosses.forEach(boss => {
+                boss.loots.forEach(loot => {
+                    if (loot.softReservedBy?.includes(currentUser)) {
+                        reservedCount++;
+                    }
+                });
+            });
+        });
+
+        if (reservedCount === 0) {
+            return 'Sélectionnez vos deux loots';
+        } else if (reservedCount === 2) {
+            return 'Sélectionnez 1 item restant';
+        } else {
+            return 'Vos deux loots sont réservés';
+        }
+    }
+
+    getReservationIconClass(): string {
+        const currentUser = this.getCurrentUser();
+
+        if (!currentUser || !this.selectedGroup || !this.selectedGroup.groupId) {
+            return 'pi pi-exclamation-triangle error-icon';
+        }
+
+        let reservedCount = 0;
+        const raids = this.raidGroups.find(group => group.groupId === this.selectedGroup!.groupId)?.raids || [];
+        raids.forEach(raid => {
+            raid.bosses.forEach(boss => {
+                boss.loots.forEach(loot => {
+                    if (loot.softReservedBy?.includes(currentUser)) {
+                        reservedCount++;
+                    }
+                });
+            });
+        });
+
+        if (reservedCount === 0) {
+            return 'pi pi-exclamation-triangle error-icon';
+        } else if (reservedCount === 2) {
+            return 'pi pi-exclamation-triangle warning-icon';
+        } else {
+            return 'pi pi-check-circle success-icon';
+        }
     }
 
     protected readonly Array = Array;
